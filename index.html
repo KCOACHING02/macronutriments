@@ -153,6 +153,8 @@
             <input type="number" id="poids" name="poids">
             <label for="taille">Taille (en cm) :</label>
             <input type="number" id="taille" name="taille">
+            <label for="objectif_poids">Objectif de poids :</label>
+            <input type="number" id="objectif_poids" name="objectif_poids">
             <label for="activite">Niveau d’activité physique :</label>
             <select id="activite" name="activite">
                 <option value="sedentaire">Sédentaire</option>
@@ -189,7 +191,6 @@
             <button class="small-button" onclick="returnToForm()">Retourner au formulaire</button>
         </div>
     </div>
-
     <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
@@ -202,20 +203,24 @@
             const age = document.getElementById('age').value;
             const poids = document.getElementById('poids').value;
             const taille = document.getElementById('taille').value;
+            const objectifPoids = document.getElementById('objectif_poids').value;
             const activite = document.getElementById('activite').value;
 
-            // Exemple de calcul des besoins en macronutriments
+            // Exemple de calcul des besoins en macronutriments pour perte de poids
             const facteurActivite = activite === 'sedentaire' ? 1.0 : activite === 'legerement_actif' ? 1.2 : activite === 'moderement_actif' ? 1.4 : activite === 'tres_actif' ? 1.6 : 1.8;
-            const besoinsProteines = Math.round(poids * facteurActivite * 1.2);
-            const besoinsGlucides = Math.round(poids * facteurActivite * 3);
-            const besoinsLipides = Math.round(poids * facteurActivite * 0.8);
+            const totalCalories = objectifPoids * facteurActivite * 24; // Exemple de calcul des calories totales
+
+            // Calcul des besoins en macronutriments
+            const besoinsProteines = Math.round((totalCalories * 0.25) / 4);
+            const besoinsGlucides = Math.round((totalCalories * 0.45) / 4);
+            const besoinsLipides = Math.round((totalCalories * 0.30) / 9);
 
             // Afficher les besoins en macronutriments
-            document.getElementById('proteines').querySelector('strong').innerText = besoinsProteines + 'g';
-            document.getElementById('glucides').querySelector('strong').innerText = besoinsGlucides + 'g';
-            document.getElementById('lipides').querySelector('strong').innerText = besoinsLipides + 'g';
+document.getElementById('proteines').querySelector('strong').innerText = `${besoinsProteines}g`;
+document.getElementById('glucides').querySelector('strong').innerText = `${besoinsGlucides}g`;
+document.getElementById('lipides').querySelector('strong').innerText = `${besoinsLipides}g`;
 
-            // Masquer le formulaire et afficher les besoins en macronutriments
+// Masquer le formulaire et afficher les besoins en macronutriments
 document.getElementById('form-container').classList.add('hidden');
 document.getElementById('nutrient-container').classList.remove('hidden');
 
@@ -225,6 +230,7 @@ const formData = {
     user_age: age,
     user_poids: poids,
     user_taille: taille,
+    user_objectifPoids: objectifPoids,
     user_activite: activite,
     user_besoinsProteines: besoinsProteines,
     user_besoinsGlucides: besoinsGlucides,
