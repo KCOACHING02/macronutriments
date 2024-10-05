@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculateur métabolique</title>
+    <title>Calcul des besoins en macronutriments</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -140,7 +140,7 @@
 <body>
     <div class="container" id="form-container">
         <img src="images/Logo.jpg" alt="Logo" class="logo">
-        <h1>Calculateur métabolique</h1>
+        <h1>Calcul des besoins en macronutriments</h1>
         <form id="metabolic-form">
             <label for="sexe">Sexe :</label>
             <select id="sexe" name="sexe">
@@ -215,41 +215,41 @@
             const besoinsGlucides = Math.round((totalCalories * 0.45) / 4);
             const besoinsLipides = Math.round((totalCalories * 0.30) / 9);
 
-            // Afficher les besoins en macronutriments
-document.getElementById('proteines').querySelector('strong').innerText = `${besoinsProteines}g`;
-document.getElementById('glucides').querySelector('strong').innerText = `${besoinsGlucides}g`;
-document.getElementById('lipides').querySelector('strong').innerText = `${besoinsLipides}g`;
+                        // Afficher les besoins en macronutriments
+            document.getElementById('proteines').querySelector('strong').innerText = `${besoinsProteines}g`;
+            document.getElementById('glucides').querySelector('strong').innerText = `${besoinsGlucides}g`;
+            document.getElementById('lipides').querySelector('strong').innerText = `${besoinsLipides}g`;
 
-// Masquer le formulaire et afficher les besoins en macronutriments
-document.getElementById('form-container').classList.add('hidden');
-document.getElementById('nutrient-container').classList.remove('hidden');
+            // Masquer le formulaire et afficher les besoins en macronutriments
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('nutrient-container').classList.remove('hidden');
 
-// Envoyer les résultats par email
-const formData = {
-    user_sexe: sexe,
-    user_age: age,
-    user_poids: poids,
-    user_taille: taille,
-    user_objectifPoids: objectifPoids,
-    user_activite: activite,
-    user_besoinsProteines: besoinsProteines,
-    user_besoinsGlucides: besoinsGlucides,
-    user_besoinsLipides: besoinsLipides
-};
+            // Envoyer les résultats par email
+            const formData = {
+                user_sexe: sexe,
+                user_age: age,
+                user_poids: poids,
+                user_taille: taille,
+                user_objectifPoids: objectifPoids,
+                user_activite: activite,
+                user_besoinsProteines: besoinsProteines,
+                user_besoinsGlucides: besoinsGlucides,
+                user_besoinsLipides: besoinsLipides
+            };
 
-emailjs.send('service_sqyzz46', 'template_pqljgzj', formData)
-    .then(function(response) {
-        console.log('SUCCESS!', response.status, response.text);
-    }, function(error) {
-        console.log('FAILED...', error);
-    });
-}
+            emailjs.send('service_sqyzz46', 'template_pqljgzj', formData)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                }, function(error) {
+                    console.log('FAILED...', error);
+                });
+        }
 
-function returnToForm() {
-    // Masquer les besoins en macronutriments et afficher le formulaire
-    document.getElementById('nutrient-container').classList.add('hidden');
-    document.getElementById('form-container').classList.remove('hidden');
-}
-</script>
+        function returnToForm() {
+            // Masquer les besoins en macronutriments et afficher le formulaire
+            document.getElementById('nutrient-container').classList.add('hidden');
+            document.getElementById('form-container').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
