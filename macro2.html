@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur métabolique</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 15px;
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 100px;
+            height: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .circle-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+        .circle {
+            background-color: #FFA500;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            border: 2px solid #FFD700;
+        }
+        .circle span {
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .image-container img {
+            width: 110px;
+            height: auto;
+        }
+        .image-button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+        .small-button {
+            padding: 5px 10px;
+            background-color: #008080;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            align-self: flex-end;
+        }
+        .buy-button {
+            background-color: #FFD700;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="form-container">
+        <img src="images/Logo.jpg" alt="Logo" class="logo">
+        <h1>Calculateur métabolique</h1>
+        <form id="metabolic-form">
+            <label for="sexe">Sexe :</label>
+            <select id="sexe" name="sexe">
+                <option value="femme">Femme</option>
+                <option value="homme">Homme</option>
+            </select>
+            <label for="age">Âge :</label>
+            <input type="number" id="age" name="age">
+            <label for="poids">Poids :</label>
+            <input type="number" id="poids" name="poids">
+            <label for="taille">Taille (en cm) :</label>
+            <input type="number" id="taille" name="taille">
+            <label for="activite">Niveau d’activité physique :</label>
+            <select id="activite" name="activite">
+                <option value="sedentaire">Sédentaire</option>
+                <option value="legerement_actif">Légèrement actif</option>
+                <option value="moderement_actif">Modérément actif</option>
+                <option value="tres_actif">Très actif</option>
+                <option value="extremement_actif">Extrêmement actif</option>
+            </select>
+            <button type="button" onclick="showNutrientNeeds()">Calculer les besoins en macronutriments</button>
+        </form>
+    </div>
+    <div class="container hidden" id="nutrient-container">
+        <h1>Besoins en macronutriments</h1>
+        <div class="circle-container">
+            <div class="circle" id="proteines"><strong></strong><span>Protéines</span></div>
+            <div class="circle" id="glucides"><strong></strong><span>Glucides</span></div>
+            <div class="circle" id="lipides"><strong></strong><span>Lipides</span></div>
+        </div>
+        <div class="image-container">
+            <div class="image-button-container">
+                <img src="images/33PTDJ.jpg" alt="Image des macronutriments">
+                <button class="buy-button" onclick="window.open('https://taplink.cc/kcoaching/d/25e2/', '_blank')">En savoir plus</button>
+            </div>
+            <div class="image-button-container">
+                <img src="images/imgprog1500.jpg" alt="Programme 1500">
+                <button class="buy-button" onclick="window.open('https://taplink.cc/kcoaching/d/1500en30jours/', '_blank')">En savoir plus</button>
+            </div>
+            <div class="image-button-container">
+                <img src="images/imgprog1400.jpg" alt="Programme 1400">
+                <button class="buy-button" onclick="window.open('https://taplink.cc/kcoaching/d/140014jours/', '_blank')">En savoir plus</button>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="small-button" onclick="returnToForm()">Retourner au formulaire</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("service_sqyzz46"); // Utilisez votre user ID EmailJS
+        })();
+
+        function showNutrientNeeds() {
+            // Récupérer les valeurs du formulaire
+            const sexe = document.getElementById('sexe').value;
+            const age = document.getElementById('age').value;
+            const poids = document.getElementById('poids').value;
+            const taille = document.getElementById('taille').value;
+            const activite = document.getElementById('activite').value;
+
+            // Exemple de calcul des besoins en macronutriments
+            const facteurActivite = activite === 'sedentaire' ? 1.0 : activite === 'legerement_actif' ? 1.2 : activite === 'moderement_actif' ? 1.4 : activite === 'tres_actif' ? 1.6 : 1.8;
+            const besoinsProteines = Math.round(poids * facteurActivite * 1.2);
+            const besoinsGlucides = Math.round(poids * facteurActivite * 3);
+            const besoinsLipides = Math.round(poids * facteurActivite * 0.8);
+
+            // Afficher les besoins en macronutriments
+            document.getElementById('proteines').querySelector('strong').innerText = besoinsProteines + 'g';
+            document.getElementById('glucides').querySelector('strong').innerText = besoinsGlucides + 'g';
+            document.getElementById('lipides').querySelector('strong').innerText = besoinsLipides + 'g';
+
+            // Masquer le formulaire et afficher les besoins en macronutriments
+document.getElementById('form-container').classList.add('hidden');
+document.getElementById('nutrient-container').classList.remove('hidden');
+
+// Envoyer les résultats par email
+const formData = {
+    user_sexe: sexe,
+    user_age: age,
+    user_poids: poids,
+    user_taille: taille,
+    user_activite: activite,
+    user_besoinsProteines: besoinsProteines,
+    user_besoinsGlucides: besoinsGlucides,
+    user_besoinsLipides: besoinsLipides
+};
+
+emailjs.send('service_sqyzz46', 'template_pqljgzj', formData)
+    .then(function(response) {
+        console.log('SUCCESS!', response.status, response.text);
+    }, function(error) {
+        console.log('FAILED...', error);
+    });
+}
+
+function returnToForm() {
+    // Masquer les besoins en macronutriments et afficher le formulaire
+    document.getElementById('nutrient-container').classList.add('hidden');
+    document.getElementById('form-container').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
