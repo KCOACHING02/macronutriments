@@ -1,7 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
-  ],
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "npm install",
+  "outputDirectory": "",
   "functions": {
     "api/bilan.js": {
       "memory": 256,
