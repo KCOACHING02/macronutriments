@@ -146,6 +146,317 @@ Tu dois produire un bilan JSON avec exactement cette structure. R\u00e9ponds UNI
     };
 
     // ── SECTION 4: APP COMPONENT ──
+    function App() {
+      const [step, setStep] = useState("intro");
+      const [current, setCurrent] = useState(0);
+      const [answers, setAnswers] = useState(Array(questions.length).fill(""));
+      const [bilan, setBilan] = useState(null);
+      const [leaving, setLeaving] = useState(false);
+      const [loadingMsg, setLoadingMsg] = useState(0);
+      const textareaRef = useRef(null);
+
+      const q = questions[current];
+      const currentBloc = BLOCS.find(b => b.qs.includes(q?.id));
+      const progress = (current / questions.length) * 100;
+      const currentAnswer = answers[current] || "";
+      const canContinue = currentAnswer.trim().length >= (q?.minLength || 15);
+
+      const LOADING_MSGS = [
+        "Analyse de ta vision de vie\u2026",
+        "Identification de tes blocages r\u00e9els\u2026",
+        "Calcul de l'\u00e9cart entre ton pr\u00e9sent et ta destination\u2026",
+        "Construction de ton bilan personnalis\u00e9\u2026",
+        "Finalisation de ton portrait\u2026",
+      ];
+
+      useEffect(() => {
+        if (step === "loading") {
+          const interval = setInterval(() => {
+            setLoadingMsg(prev => (prev + 1) % LOADING_MSGS.length);
+          }, 1800);
+          return () => clearInterval(interval);
+        }
+      }, [step]);
+
+      useEffect(() => {
+        if (textareaRef.current) textareaRef.current.focus();
+      }, [current]);
+
+      const go = (fn) => { setLeaving(true); setTimeout(() => { fn(); setLeaving(false); }, 280); };
+
+      const handleAnswer = (val) => {
+        const newAnswers = [...answers];
+        newAnswers[current] = val;
+        setAnswers(newAnswers);
+      };
+
+      const handleNext = () => {
+        if (!canContinue) return;
+        go(() => {
+          if (current + 1 < questions.length) {
+            setCurrent(current + 1);
+          } else {
+            generateBilan();
+          }
+        });
+      };
+
+      const handleKeyDown = (e) => {
+        if (e.key === "Enter" && e.metaKey && canContinue) handleNext();
+      };
+
+      const generateBilan = async () => {
+        setStep("loading");
+        try {
+          const prompt = buildPrompt(answers);
+          const response = await fetch("/api/bilan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system: "Tu es un expert en psychologie de la motivation et en business en ligne. Tu r\u00e9ponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans aucun texte avant ou apr\u00e8s le JSON.",
+              messages: [{ role: "user", content: prompt }],
+            }),
+          });
+          const data = await response.json();
+          if (data.error) throw new Error(data.error);
+          const text = data.content?.[0]?.text || "";
+          const clean = text.replace(/```json|```/g, "").trim();
+          const parsed = JSON.parse(clean);
+          setBilan(parsed);
+          setStep("result");
+        } catch (err) {
+          console.error(err);
+          setBilan({ error: true });
+          setStep("result");
+        }
+      };
+
+      const restart = () => go(() => {
+        setStep("intro"); setCurrent(0);
+        setAnswers(Array(questions.length).fill(""));
+        setBilan(null); setLoadingMsg(0);
+      });
+
+      const verdict = bilan?.verdict ? VERDICT_CONFIG[bilan.verdict] : null;
+
+      return (
+        <div style={S.root}>
+          <style>{CSS}</style>
+
+          {/* INTRO */}
+          {step === "intro" && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                <div style={S.brandRow}><span style={S.dot}/><span style={S.brand}>Code Libert\u00e9</span></div>
+                <div style={S.introHero}>
+                  <p style={S.kicker}>Bilan de vie \u00b7 10 questions \u00b7 5 min</p>
+                  <h1 style={S.h1}>Quelle vie<br /><span style={S.accent}>veux-tu vraiment ?</span></h1>
+                  <p style={S.desc}>
+                    Ce questionnaire n'est pas sur Code Libert\u00e9. Il est sur <strong style={{color:"#fff"}}>toi</strong> \u2014 ta vision, ton pr\u00e9sent, tes blocages. \u00c0 la fin, tu re\u00e7ois un bilan personnalis\u00e9 g\u00e9n\u00e9r\u00e9 par IA qui analyse tes r\u00e9ponses et te dit exactement ce qu'il te faut pour atteindre la vie que tu veux.
+                  </p>
+                </div>
+                <div style={S.blocsRow}>
+                  {BLOCS.map(b => (
+                    <div key={b.id} style={{ ...S.blocCard, borderColor: b.color + "35", background: b.color + "08" }}>
+                      <span style={S.blocEmoji}>{b.emoji}</span>
+                      <span style={{ ...S.blocLabel, color: b.color }}>{b.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={S.warningBox}>
+                  <span style={S.warningIcon}>{"\u270D\uFE0F"}</span>
+                  <p style={S.warningTxt}>Ce questionnaire utilise des champs libres \u2014 pas des cases \u00e0 cocher. Plus tu es pr\u00e9cis(e), plus ton bilan sera percutant.</p>
+                </div>
+                <button className="btn-main" onClick={() => go(() => setStep("quiz"))}>
+                  Commencer mon bilan \u2192
+                </button>
+                <p style={S.social}>Bilan g\u00e9n\u00e9r\u00e9 par IA \u00b7 100% personnalis\u00e9 \u00b7 Gratuit</p>
+              </div>
+            </div>
+          )}
+
+          {/* QUIZ */}
+          {step === "quiz" && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                <div style={S.quizTop}>
+                  <span style={S.brandSm}>Code Libert\u00e9</span>
+                  <span style={S.qNum}>{current + 1}<span style={S.qOf}>/10</span></span>
+                </div>
+                <div style={S.track}>
+                  <div style={{ ...S.fill, width: `${progress}%`, background: currentBloc?.color }} />
+                </div>
+                <div style={{ ...S.blocTag, color: currentBloc?.color, borderColor: currentBloc?.color + "40", background: currentBloc?.color + "10" }}>
+                  {currentBloc?.emoji} {currentBloc?.label}
+                </div>
+                <div style={S.qBlock}>
+                  <span style={S.qEmoji}>{q.emoji}</span>
+                  <h2 style={S.qText}>{q.text}</h2>
+                  {q.hint && <p style={{ ...S.qHint, color: currentBloc?.color + "cc" }}>{q.hint}</p>}
+                </div>
+                <div style={S.textareaWrap}>
+                  <textarea
+                    ref={textareaRef}
+                    style={S.textarea}
+                    value={currentAnswer}
+                    onChange={e => handleAnswer(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={q.placeholder}
+                    rows={5}
+                  />
+                  <div style={S.textareaFooter}>
+                    <span style={{ ...S.charCount, color: canContinue ? currentBloc?.color : "rgba(255,255,255,0.2)" }}>
+                      {currentAnswer.length} caract\u00e8res {canContinue ? "\u2713" : `(min ${q.minLength})`}
+                    </span>
+                    <span style={S.cmdHint}>{"\u2318"} + Entr\u00e9e pour continuer</span>
+                  </div>
+                </div>
+                <button
+                  className="btn-main"
+                  style={{ opacity: canContinue ? 1 : 0.2, pointerEvents: canContinue ? "auto" : "none", background: currentBloc?.color }}
+                  onClick={handleNext}
+                >
+                  {current === questions.length - 1 ? "G\u00e9n\u00e9rer mon bilan \u2192" : "Continuer \u2192"}
+                </button>
+                {current > 0 && (
+                  <button className="btn-back" onClick={() => go(() => setCurrent(current - 1))}>
+                    \u2190 Question pr\u00e9c\u00e9dente
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* LOADING */}
+          {step === "loading" && (
+            <div className="pg en" style={{ alignItems: "center", minHeight: "100vh" }}>
+              <div style={S.loadingWrap}>
+                <div style={S.loadingOrb} />
+                <div style={S.loadingSpinner}>
+                  <div className="spinner" />
+                </div>
+                <h2 style={S.loadingTitle}>Analyse en cours...</h2>
+                <p style={S.loadingMsg}>{LOADING_MSGS[loadingMsg]}</p>
+                <p style={S.loadingNote}>L'IA analyse tes 10 r\u00e9ponses pour construire ton bilan unique</p>
+              </div>
+            </div>
+          )}
+
+          {/* RESULT */}
+          {step === "result" && bilan && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                {bilan.error ? (
+                  <div style={S.errorBox}>
+                    <p style={S.errorTxt}>Une erreur s'est produite lors de la g\u00e9n\u00e9ration. R\u00e9essaie dans quelques instants.</p>
+                    <button className="btn-main" style={{ background: "#E8452A", marginTop: 16 }} onClick={restart}>Recommencer</button>
+                  </div>
+                ) : (
+                  <>
+                    {verdict && (
+                      <div style={{ ...S.verdictBadge, color: verdict.color, borderColor: verdict.color + "50", background: verdict.color + "12" }}>
+                        {verdict.badge}
+                      </div>
+                    )}
+                    <div style={S.resultHero}>
+                      <span style={S.resultEmoji}>{verdict?.emoji || "\u{1F31F}"}</span>
+                      <h2 style={S.resultH2}>"{bilan.vision_titre}"</h2>
+                      <div style={{ ...S.heroLine, background: verdict?.color || "#E8452A" }} />
+                    </div>
+                    <div style={S.mirrorBox}>
+                      <p style={S.mirrorLabel}>CE QUE TES R\u00c9PONSES R\u00c9V\u00c8LENT</p>
+                      <p style={S.mirrorTxt}>{bilan.vision_portrait}</p>
+                    </div>
+                    <div style={S.ecartBox}>
+                      <span style={S.ecartIcon}>{"\u{1F4CD}"}</span>
+                      <div>
+                        <p style={S.ecartLabel}>L'\u00c9CART AUJOURD'HUI</p>
+                        <p style={S.ecartTxt}>{bilan.ecart_brutal}</p>
+                      </div>
+                    </div>
+                    {bilan.contradiction && (
+                      <div style={S.contraBox}>
+                        <span style={S.contraIcon}>{"\u26A1"}</span>
+                        <p style={S.contraTxt}>{bilan.contradiction}</p>
+                      </div>
+                    )}
+                    <div style={S.forceBox}>
+                      <p style={S.forceLabel}>{"\u{1F4AA}"} TA FORCE CACH\u00c9E</p>
+                      <p style={S.forceTxt}>{bilan.force_cachee}</p>
+                    </div>
+                    <div style={S.peurBox}>
+                      <p style={S.peurLabel}>{"\u{1F630}"} TA PEUR PRINCIPALE</p>
+                      <p style={S.peurTxt}>{bilan.peur_nommee}</p>
+                    </div>
+                    <div style={S.blocageBox}>
+                      <span style={S.blocageDot} />
+                      <p style={S.blocageTxt}><strong>Blocage n\u00b01 :</strong> {bilan.blocage_principal}</p>
+                    </div>
+                    <div style={S.questionBox}>
+                      <p style={S.questionLabel}>LA QUESTION QUI CHANGE TOUT</p>
+                      <p style={S.questionTxt}>"{bilan.question_cle}"</p>
+                    </div>
+                    <div style={{ ...S.verdictBox, borderColor: verdict?.color + "40", background: verdict?.color + "08" }}>
+                      <p style={{ ...S.verdictLabel, color: verdict?.color }}>POURQUOI CODE LIBERT\u00c9</p>
+                      <p style={S.verdictTxt}>{bilan.verdict_raison}</p>
+                      {bilan.code_liberte_lien && (
+                        <p style={{ ...S.clLienTxt, borderTop: "1px solid " + (verdict?.color + "30"), paddingTop: 12, marginTop: 12 }}>
+                          {bilan.code_liberte_lien}
+                        </p>
+                      )}
+                    </div>
+                    <div style={S.pasBox}>
+                      <p style={S.pasLabel}>{"\u{1F3AF}"} TON PREMIER PAS AUJOURD'HUI</p>
+                      <p style={S.pasTxt}>{bilan.premier_pas}</p>
+                    </div>
+                    <div style={S.phraseBox}>
+                      <p style={S.phraseTxt}>"{bilan.phrase_miroir}"</p>
+                      <p style={S.phraseCredit}>\u2014 Ton bilan Code Libert\u00e9</p>
+                    </div>
+                    {verdict?.urgency && (
+                      <div style={S.urgBox}>
+                        <span style={S.urgDot} />
+                        <span style={S.urgTxt}>{verdict.urgency}</span>
+                      </div>
+                    )}
+                    {verdict?.cta && (
+                      <button
+                        className="btn-cta"
+                        style={{ background: verdict.color }}
+                        onClick={() => alert("Redirection \u2192 " + verdict.cta)}
+                      >
+                        {verdict.cta}
+                      </button>
+                    )}
+                    {bilan.seller_notes && (
+                      <details style={S.seller}>
+                        <summary style={S.sellerSum}>{"\u{1F4CA}"} Donn\u00e9es vendeur (priv\u00e9)</summary>
+                        <div style={S.sellerBody}>
+                          {[
+                            ["Temp\u00e9rature", bilan.seller_notes.temperature],
+                            ["Blocage dominant", bilan.seller_notes.blocage_dominant],
+                            ["Urgence", bilan.seller_notes.urgence],
+                            ["Action recommand\u00e9e", bilan.seller_notes.action_recommandee],
+                            ["Ton \u00e0 adopter", bilan.seller_notes.ton_a_adopter],
+                          ].map(([k, v]) => (
+                            <div key={k} style={S.sellerRow}>
+                              <span style={S.sellerKey}>{k}</span>
+                              <span style={{ ...S.sellerVal, color: verdict?.color }}>{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                    <button className="btn-ghost" onClick={restart}>Refaire le bilan</button>
+                    <p style={S.footer}>Code Libert\u00e9 \u00b7 Brille & Vibre</p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
 
     // ── SECTION 5: STYLES (S object) ──
 
