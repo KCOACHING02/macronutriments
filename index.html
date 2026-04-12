@@ -215,7 +215,7 @@ Tu dois produire un bilan JSON avec exactement cette structure. Réponds UNIQUEM
             }),
           });
           const data = await response.json();
-          if (data.error) throw new Error(data.error);
+          if (data.error) throw new Error(data.details || data.error);
           const text = data.content?.[0]?.text || "";
           const clean = text.replace(/```json|```/g, "").trim();
           const parsed = JSON.parse(clean);
