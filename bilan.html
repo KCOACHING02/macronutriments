@@ -16,6 +16,78 @@
     const { useState, useRef, useEffect } = React;
 
     // ── SECTION 1: QUESTIONS ──
+    const questions = [
+      {
+        id: 1, bloc: "vision", emoji: "🌍", label: "Ta destination",
+        text: "Si l'argent n'était plus un problème, où vivrais-tu et comment ressembleraient tes journées ?",
+        placeholder: "Ex : Je me réveillerais à Bali face à la mer, sans alarme, je prendrais mon café en regardant le soleil se lever…",
+        hint: "Sois précis(e) — le lieu, l'ambiance, les détails qui te font vibrer",
+        minLength: 30,
+      },
+      {
+        id: 2, bloc: "vision", emoji: "⏰", label: "Ta journée idéale",
+        text: "Décris ta journée parfaite — du réveil au coucher. Sans contraintes, sans patron, sans agenda imposé.",
+        placeholder: "Ex : Je me lève quand j'en ai envie, je travaille 3h sur mes projets depuis un café, je passe l'après-midi avec mes enfants…",
+        hint: "Le plus concret possible — les heures, les activités, les ressentis",
+        minLength: 30,
+      },
+      {
+        id: 3, bloc: "vision", emoji: "❤️", label: "Ce qui compte vraiment",
+        text: "Pour qui ou pour quoi tu veux vraiment réussir ? Qu'est-ce que cette réussite changerait pour eux ?",
+        placeholder: "Ex : Pour mes enfants — je veux qu'ils voient que c'est possible. Pour ma mère que j'aimerais sortir de ses galères…",
+        hint: "La vraie raison derrière l'ambition",
+        minLength: 20,
+      },
+      {
+        id: 4, bloc: "vision", emoji: "🏆", label: "Ta définition du succès",
+        text: "Dans 3 ans, si tout s'est passé exactement comme tu le voulais, tu te retrouves où ? Qu'est-ce qui a changé ?",
+        placeholder: "Ex : J'ai quitté mon CDI, je gagne 5 000€/mois depuis mon laptop, je voyage 4 mois par an…",
+        hint: "Sois ambitieux(se) — c'est ton film, pas celui des autres",
+        minLength: 30,
+      },
+      {
+        id: 5, bloc: "present", emoji: "😤", label: "Ta réalité aujourd'hui",
+        text: "Décris ta vie actuelle honnêtement. Ce que tu fais, ce que tu ressens, ce qui te pèse le plus.",
+        placeholder: "Ex : Je me lève à 6h30 pour un boulot qui me rapporte 2 200€/mois, je rentre épuisé(e), il ne me reste plus rien pour moi…",
+        hint: "Pas besoin de mettre les formes — dis-le comme tu le ressens",
+        minLength: 30,
+      },
+      {
+        id: 6, bloc: "present", emoji: "📱", label: "Ton rapport au digital",
+        text: "Tu passes combien de temps sur ton téléphone par jour ? Tu fais quoi avec ce temps ?",
+        placeholder: "Ex : Facilement 3h, surtout TikTok et Instagram. Je regarde des gens voyager ou parler de leurs revenus en ligne…",
+        hint: "Sois honnête — cette réponse va compter dans ton bilan",
+        minLength: 15,
+      },
+      {
+        id: 7, bloc: "present", emoji: "💸", label: "Ta situation financière",
+        text: "Ta situation financière aujourd'hui — revenus, dépenses, ce qu'il te manque pour vivre la vie que tu veux.",
+        placeholder: "Ex : Je gagne 2 500€, il m'en faudrait le double pour être tranquille. J'ai des dettes/des économies de…",
+        hint: "Pas de jugement — c'est pour calibrer ce dont tu as besoin",
+        minLength: 20,
+      },
+      {
+        id: 8, bloc: "blocages", emoji: "🧱", label: "Ce qui t'a arrêté(e)",
+        text: "T'as déjà essayé de changer ta situation ? Qu'est-ce qui s'est passé ? Qu'est-ce qui t'a bloqué(e) ?",
+        placeholder: "Ex : J'ai essayé le dropshipping, j'ai perdu 300€. J'ai acheté une formation que je n'ai jamais terminée. J'ai peur de…",
+        hint: "Les tentatives passées sont de l'or — pas des échecs",
+        minLength: 20,
+      },
+      {
+        id: 9, bloc: "blocages", emoji: "😰", label: "Ta plus grande peur",
+        text: "Si tu devais nommer ta plus grande peur par rapport au business en ligne, ce serait quoi ?",
+        placeholder: "Ex : Que ça ne marche pas et que j'aie perdu mon argent. Que mon entourage se moque. Que je ne sois pas assez…",
+        hint: "La vraie peur, pas la version présentable",
+        minLength: 15,
+      },
+      {
+        id: 10, bloc: "blocages", emoji: "⚡", label: "Ce qui changerait tout",
+        text: "Qu'est-ce qui te ferait passer à l'action cette semaine si tu l'avais ? Qu'est-ce qu'il te manque vraiment ?",
+        placeholder: "Ex : Une méthode prouvée. Quelqu'un qui m'accompagne. La certitude que ça va marcher. Un mentor qui…",
+        hint: "Le déclic qu'il te faut",
+        minLength: 15,
+      },
+    ];
 
     // ── SECTION 2: SYSTEM PROMPT IA ──
 
