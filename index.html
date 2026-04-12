@@ -223,7 +223,7 @@ Tu dois produire un bilan JSON avec exactement cette structure. Réponds UNIQUEM
           setStep("result");
         } catch (err) {
           console.error(err);
-          setBilan({ error: true });
+          setBilan({ error: true, errorMsg: err.message });
           setStep("result");
         }
       };
@@ -346,6 +346,7 @@ Tu dois produire un bilan JSON avec exactement cette structure. Réponds UNIQUEM
                 {bilan.error ? (
                   <div style={S.errorBox}>
                     <p style={S.errorTxt}>Une erreur s'est produite lors de la génération. Réessaie dans quelques instants.</p>
+                    {bilan.errorMsg && <p style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginTop:8,wordBreak:"break-all"}}>Détail : {bilan.errorMsg}</p>}
                     <button className="btn-main" style={{ background: "#E8452A", marginTop: 16 }} onClick={restart}>Recommencer</button>
                   </div>
                 ) : (
