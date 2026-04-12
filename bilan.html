@@ -16,6 +16,81 @@
     const { useState, useRef, useEffect } = React;
 
     // ── SECTION 1: QUESTIONS ──
+    const questions = [
+      // BLOC 1 — LA VIE QUE TU VEUX
+      {
+        id: 1, bloc: "vision", emoji: "\u{1F30D}", label: "Ta destination",
+        text: "Si l'argent n'\u00e9tait plus un probl\u00e8me, o\u00f9 vivrais-tu et comment ressembleraient tes journ\u00e9es ?",
+        placeholder: "Ex : Je me r\u00e9veillerais \u00e0 Bali face \u00e0 la mer, sans alarme, je prendrais mon caf\u00e9 en regardant le soleil se lever\u2026",
+        hint: "Sois pr\u00e9cis(e) \u2014 le lieu, l'ambiance, les d\u00e9tails qui te font vibrer",
+        minLength: 30,
+      },
+      {
+        id: 2, bloc: "vision", emoji: "\u23F0", label: "Ta journ\u00e9e id\u00e9ale",
+        text: "D\u00e9cris ta journ\u00e9e parfaite \u2014 du r\u00e9veil au coucher. Sans contraintes, sans patron, sans agenda impos\u00e9.",
+        placeholder: "Ex : Je me l\u00e8ve quand j'en ai envie, je travaille 3h sur mes projets depuis un caf\u00e9, je passe l'apr\u00e8s-midi avec mes enfants\u2026",
+        hint: "Le plus concret possible \u2014 les heures, les activit\u00e9s, les ressentis",
+        minLength: 30,
+      },
+      {
+        id: 3, bloc: "vision", emoji: "\u2764\uFE0F", label: "Ce qui compte vraiment",
+        text: "Pour qui ou pour quoi tu veux vraiment r\u00e9ussir ? Qu'est-ce que cette r\u00e9ussite changerait pour eux ?",
+        placeholder: "Ex : Pour mes enfants \u2014 je veux qu'ils voient que c'est possible. Pour ma m\u00e8re que j'aimerais sortir de ses gal\u00e8res\u2026",
+        hint: "La vraie raison derri\u00e8re l'ambition",
+        minLength: 20,
+      },
+      {
+        id: 4, bloc: "vision", emoji: "\u{1F3C6}", label: "Ta d\u00e9finition du succ\u00e8s",
+        text: "Dans 3 ans, si tout s'est pass\u00e9 exactement comme tu le voulais, tu te retrouves o\u00f9 ? Qu'est-ce qui a chang\u00e9 ?",
+        placeholder: "Ex : J'ai quitt\u00e9 mon CDI, je gagne 5 000\u20AC/mois depuis mon laptop, je voyage 4 mois par an\u2026",
+        hint: "Sois ambitieux(se) \u2014 c'est ton film, pas celui des autres",
+        minLength: 30,
+      },
+      // BLOC 2 — TON PR\u00c9SENT
+      {
+        id: 5, bloc: "present", emoji: "\u{1F624}", label: "Ta r\u00e9alit\u00e9 aujourd'hui",
+        text: "D\u00e9cris ta vie actuelle honn\u00eatement. Ce que tu fais, ce que tu ressens, ce qui te p\u00e8se le plus.",
+        placeholder: "Ex : Je me l\u00e8ve \u00e0 6h30 pour un boulot qui me rapporte 2 200\u20AC/mois, je rentre \u00e9puis\u00e9(e), il ne me reste plus rien pour moi\u2026",
+        hint: "Pas besoin de mettre les formes \u2014 dis-le comme tu le ressens",
+        minLength: 30,
+      },
+      {
+        id: 6, bloc: "present", emoji: "\u{1F4F1}", label: "Ton rapport au digital",
+        text: "Tu passes combien de temps sur ton t\u00e9l\u00e9phone par jour ? Tu fais quoi avec ce temps ?",
+        placeholder: "Ex : Facilement 3h, surtout TikTok et Instagram. Je regarde des gens voyager ou parler de leurs revenus en ligne\u2026",
+        hint: "Sois honn\u00eate \u2014 cette r\u00e9ponse va compter dans ton bilan",
+        minLength: 15,
+      },
+      {
+        id: 7, bloc: "present", emoji: "\u{1F4B8}", label: "Ta situation financi\u00e8re",
+        text: "Ta situation financi\u00e8re aujourd'hui \u2014 revenus, d\u00e9penses, ce qu'il te manque pour vivre la vie que tu veux.",
+        placeholder: "Ex : Je gagne 2 500\u20AC, il m'en faudrait le double pour \u00eatre tranquille. J'ai des dettes/des \u00e9conomies de\u2026",
+        hint: "Pas de jugement \u2014 c'est pour calibrer ce dont tu as besoin",
+        minLength: 20,
+      },
+      // BLOC 3 — TES BLOCAGES
+      {
+        id: 8, bloc: "blocages", emoji: "\u{1F9F1}", label: "Ce qui t'a arr\u00eat\u00e9(e)",
+        text: "T'as d\u00e9j\u00e0 essay\u00e9 de changer ta situation ? Qu'est-ce qui s'est pass\u00e9 ? Qu'est-ce qui t'a bloqu\u00e9(e) ?",
+        placeholder: "Ex : J'ai essay\u00e9 le dropshipping, j'ai perdu 300\u20AC. J'ai achet\u00e9 une formation que je n'ai jamais termin\u00e9e. J'ai peur de\u2026",
+        hint: "Les tentatives pass\u00e9es sont de l'or \u2014 pas des \u00e9checs",
+        minLength: 20,
+      },
+      {
+        id: 9, bloc: "blocages", emoji: "\u{1F630}", label: "Ta plus grande peur",
+        text: "Si tu devais nommer ta plus grande peur par rapport au business en ligne, ce serait quoi ?",
+        placeholder: "Ex : Que \u00e7a ne marche pas et que j'aie perdu mon argent. Que mon entourage se moque. Que je ne sois pas assez\u2026",
+        hint: "La vraie peur, pas la version pr\u00e9sentable",
+        minLength: 15,
+      },
+      {
+        id: 10, bloc: "blocages", emoji: "\u26A1", label: "Ce qui changerait tout",
+        text: "Qu'est-ce qui te ferait passer \u00e0 l'action cette semaine si tu l'avais ? Qu'est-ce qu'il te manque vraiment ?",
+        placeholder: "Ex : Une m\u00e9thode prouv\u00e9e. Quelqu'un qui m'accompagne. La certitude que \u00e7a va marcher. Un mentor qui\u2026",
+        hint: "Le d\u00e9clic qu'il te faut",
+        minLength: 15,
+      },
+    ];
 
     // ── SECTION 2: SYSTEM PROMPT IA ──
 
