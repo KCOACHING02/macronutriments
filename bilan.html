@@ -459,6 +459,125 @@ Tu dois produire un bilan JSON avec exactement cette structure. R\u00e9ponds UNI
     }
 
     // ── SECTION 5: STYLES (S object) ──
+    const S = {
+      root: { minHeight: "100vh", background: "#0b0908", display: "flex", justifyContent: "center", padding: "0 16px 80px", fontFamily: "'Outfit',sans-serif" },
+      wrap: { width: "100%", maxWidth: 520, paddingTop: 40, display: "flex", flexDirection: "column", gap: 18 },
+
+      brandRow: { display: "flex", alignItems: "center", gap: 9 },
+      dot: { width: 8, height: 8, borderRadius: "50%", background: "#E8452A", flexShrink: 0 },
+      brand: { fontSize: 14, fontWeight: 800, color: "#fff", letterSpacing: "0.08em", textTransform: "uppercase" },
+      brandSm: { fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", textTransform: "uppercase" },
+
+      introHero: { display: "flex", flexDirection: "column", gap: 12 },
+      kicker: { fontSize: 11, color: "#E8452A", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700 },
+      h1: { fontSize: 34, fontWeight: 800, color: "#fff", lineHeight: 1.18, letterSpacing: "-0.02em" },
+      accent: { color: "#E8452A" },
+      desc: { fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.72 },
+
+      blocsRow: { display: "flex", gap: 8 },
+      blocCard: { flex: 1, border: "1px solid", borderRadius: 12, padding: "12px 10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 },
+      blocEmoji: { fontSize: 22 },
+      blocLabel: { fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textAlign: "center" },
+
+      warningBox: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "14px 16px", display: "flex", gap: 12, alignItems: "flex-start" },
+      warningIcon: { fontSize: 18, flexShrink: 0 },
+      warningTxt: { fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 },
+      social: { fontSize: 12, color: "rgba(255,255,255,0.2)", textAlign: "center" },
+
+      quizTop: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+      qNum: { fontSize: 18, fontWeight: 800, color: "#fff" },
+      qOf: { fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: 400 },
+      track: { height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, overflow: "hidden" },
+      fill: { height: "100%", borderRadius: 2, transition: "width 0.45s ease" },
+      blocTag: { fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 20, border: "1px solid", alignSelf: "flex-start" },
+
+      qBlock: { display: "flex", flexDirection: "column", gap: 8 },
+      qEmoji: { fontSize: 28 },
+      qText: { fontSize: 20, fontWeight: 700, color: "#fff", lineHeight: 1.38, letterSpacing: "-0.01em" },
+      qHint: { fontSize: 12, fontWeight: 500, letterSpacing: "0.03em", fontStyle: "italic" },
+
+      textareaWrap: { display: "flex", flexDirection: "column", gap: 0 },
+      textarea: {
+        width: "100%", background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.1)",
+        borderRadius: "12px 12px 0 0", padding: "16px", color: "#fff", fontSize: 15, lineHeight: 1.65,
+        fontFamily: "'Outfit',sans-serif", resize: "none", outline: "none",
+        transition: "border-color 0.15s",
+      },
+      textareaFooter: { background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(255,255,255,0.08)", borderTop: "none", borderRadius: "0 0 12px 12px", padding: "8px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+      charCount: { fontSize: 11, fontWeight: 600, transition: "color 0.2s" },
+      cmdHint: { fontSize: 11, color: "rgba(255,255,255,0.2)" },
+
+      loadingWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 20, paddingTop: 120, textAlign: "center", maxWidth: 320 },
+      loadingOrb: { width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, #E8452A22, transparent)", position: "absolute", animation: "orbPulse 2s ease-in-out infinite" },
+      loadingSpinner: { width: 56, height: 56, position: "relative", zIndex: 1 },
+      loadingTitle: { fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.01em" },
+      loadingMsg: { fontSize: 14, color: "#E8452A", fontWeight: 600, minHeight: 20, transition: "opacity 0.3s" },
+      loadingNote: { fontSize: 12, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 },
+
+      errorBox: { background: "rgba(255,50,50,0.08)", border: "1px solid rgba(255,50,50,0.2)", borderRadius: 14, padding: "20px" },
+      errorTxt: { fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 },
+
+      verdictBadge: { fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "6px 16px", borderRadius: 20, border: "1px solid", alignSelf: "flex-start" },
+      resultHero: { display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10 },
+      resultEmoji: { fontSize: 52, lineHeight: 1 },
+      resultH2: { fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.3, letterSpacing: "-0.02em", fontStyle: "italic" },
+      heroLine: { width: 32, height: 3, borderRadius: 2 },
+
+      mirrorBox: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "18px" },
+      mirrorLabel: { fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", marginBottom: 10 },
+      mirrorTxt: { fontSize: 15, color: "rgba(255,255,255,0.82)", lineHeight: 1.7 },
+
+      ecartBox: { display: "flex", gap: 14, alignItems: "flex-start", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px" },
+      ecartIcon: { fontSize: 20, flexShrink: 0 },
+      ecartLabel: { fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", marginBottom: 6 },
+      ecartTxt: { fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.65 },
+
+      contraBox: { background: "rgba(232,69,42,0.08)", border: "1px solid rgba(232,69,42,0.25)", borderRadius: 12, padding: "14px 16px", display: "flex", gap: 12, alignItems: "flex-start" },
+      contraIcon: { fontSize: 18, flexShrink: 0 },
+      contraTxt: { fontSize: 14, color: "rgba(255,255,255,0.78)", lineHeight: 1.6, fontWeight: 500 },
+
+      forceBox: { background: "rgba(27,107,74,0.08)", border: "1px solid rgba(27,107,74,0.25)", borderRadius: 14, padding: "16px" },
+      forceLabel: { fontSize: 10, fontWeight: 800, color: "rgba(27,107,74,0.8)", letterSpacing: "0.15em", marginBottom: 8 },
+      forceTxt: { fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.65 },
+
+      peurBox: { background: "rgba(147,51,234,0.08)", border: "1px solid rgba(147,51,234,0.25)", borderRadius: 14, padding: "16px" },
+      peurLabel: { fontSize: 10, fontWeight: 800, color: "rgba(147,51,234,0.8)", letterSpacing: "0.15em", marginBottom: 8 },
+      peurTxt: { fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.65 },
+
+      blocageBox: { display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 16px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" },
+      blocageDot: { width: 7, height: 7, borderRadius: "50%", background: "#E8452A", flexShrink: 0, marginTop: 5 },
+      blocageTxt: { fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 },
+
+      questionBox: { background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: "18px" },
+      questionLabel: { fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", marginBottom: 10 },
+      questionTxt: { fontSize: 17, fontStyle: "italic", color: "#fff", lineHeight: 1.55, fontWeight: 600 },
+
+      verdictBox: { border: "1px solid", borderRadius: 14, padding: "18px" },
+      verdictLabel: { fontSize: 10, fontWeight: 800, letterSpacing: "0.15em", marginBottom: 10 },
+      verdictTxt: { fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.7 },
+      clLienTxt: { fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.65 },
+
+      pasBox: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px" },
+      pasLabel: { fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", marginBottom: 8 },
+      pasTxt: { fontSize: 14, color: "rgba(255,255,255,0.75)", lineHeight: 1.65, fontWeight: 500 },
+
+      phraseBox: { background: "linear-gradient(135deg, rgba(232,69,42,0.12), rgba(147,51,234,0.08))", border: "1px solid rgba(232,69,42,0.3)", borderRadius: 16, padding: "22px 20px", textAlign: "center" },
+      phraseTxt: { fontSize: 18, fontStyle: "italic", color: "#fff", lineHeight: 1.5, fontWeight: 700 },
+      phraseCredit: { fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 10, letterSpacing: "0.05em" },
+
+      urgBox: { display: "flex", alignItems: "center", gap: 10, background: "#120D00", border: "1px solid #2A1C00", borderRadius: 10, padding: "10px 16px" },
+      urgDot: { width: 7, height: 7, borderRadius: "50%", background: "#F59E0B", flexShrink: 0, animation: "pulse 1.5s infinite" },
+      urgTxt: { fontSize: 12, color: "#F59E0B", fontWeight: 600 },
+
+      seller: { border: "1px dashed rgba(255,255,255,0.09)", borderRadius: 12, padding: "12px 14px" },
+      sellerSum: { fontSize: 12, color: "rgba(255,255,255,0.22)", cursor: "pointer", userSelect: "none" },
+      sellerBody: { marginTop: 12, display: "flex", flexDirection: "column", gap: 10 },
+      sellerRow: { display: "flex", flexDirection: "column", gap: 2, borderBottom: "1px solid rgba(255,255,255,0.04)", paddingBottom: 8 },
+      sellerKey: { fontSize: 10, color: "rgba(255,255,255,0.25)", letterSpacing: "0.08em", textTransform: "uppercase" },
+      sellerVal: { fontSize: 13, fontWeight: 600, lineHeight: 1.4 },
+
+      footer: { textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.1)", marginTop: 4 },
+    };
 
     // ── SECTION 6: CSS STRING ──
 
