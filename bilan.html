@@ -130,6 +130,17 @@ Tu dois produire un bilan JSON avec exactement cette structure. Réponds UNIQUEM
     }
 
     // ── SECTION 3: BLOCS CONFIG + VERDICT CONFIG ──
+    const BLOCS = [
+      { id: "vision", label: "Ta vision", emoji: "🌟", color: "#E8452A", qs: [1,2,3,4] },
+      { id: "present", label: "Ton présent", emoji: "📍", color: "#1A6B8A", qs: [5,6,7] },
+      { id: "blocages", label: "Tes blocages", emoji: "🧱", color: "#9333EA", qs: [8,9,10] },
+    ];
+
+    const VERDICT_CONFIG = {
+      oui: { emoji: "🚀", color: "#1B6B4A", badge: "✅ Code Liberté est ton véhicule", cta: "Rejoindre Code Liberté maintenant →", urgency: "🔥 Places limitées — tarif de lancement" },
+      bientot: { emoji: "🔧", color: "#C05A1F", badge: "⚠️ Presque prêt(e)", cta: "Rejoindre la liste d'attente →", urgency: "Accompagnement gratuit en attendant" },
+      non: { emoji: "🧭", color: "#7B6E5E", badge: "🧭 Pas encore le bon moment", cta: null, urgency: null },
+    };
 
     // ── SECTION 4: APP COMPONENT ──
 
