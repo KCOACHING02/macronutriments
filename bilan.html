@@ -90,6 +90,44 @@
     ];
 
     // ── SECTION 2: SYSTEM PROMPT IA ──
+    function buildPrompt(answers) {
+      const formatted = answers.map((a, i) => {
+        const q = questions[i];
+        return `[${q.emoji} ${q.label}]\nQuestion : ${q.text}\nRéponse : ${a}`;
+      }).join("\n\n");
+
+      return `Tu es un expert en psychologie de la motivation et en business en ligne. Tu analyses les réponses d'une personne à un questionnaire de vision de vie pour lui produire un bilan personnalisé percutant.
+
+RÉPONSES DE LA PERSONNE :
+${formatted}
+
+INSTRUCTIONS POUR LE BILAN :
+Tu dois produire un bilan JSON avec exactement cette structure. Réponds UNIQUEMENT avec le JSON, rien d'autre.
+
+{
+  "prenom_suppose": "Prénom supposé ou 'toi' si impossible à deviner",
+  "vision_titre": "Un titre court et percutant qui résume SA vision de vie en 8 mots max — utilise SES propres mots",
+  "vision_portrait": "2-3 phrases qui décrivent sa vie rêvée avec SES propres mots exacts. Commence par 'Tu veux…' et sois ultra précis(e) avec ce qu'il/elle a écrit. Effet miroir total.",
+  "ecart_brutal": "1-2 phrases qui nomment l'écart entre sa vie actuelle et sa vision. Direct, sans filtre. Pas de jugement mais pas de complaisance. Utilise ses chiffres et sa situation réelle.",
+  "contradiction": "Si il/elle passe du temps sur son téléphone mais dit manquer de temps — nomme cette contradiction directement. Sinon laisse vide.",
+  "force_cachee": "Ce que ses réponses révèlent sur ses forces réelles qu'il/elle ne voit pas. Basé sur ce qu'il/elle a écrit — pas des généralités.",
+  "peur_nommee": "Reformule sa peur principale avec ses propres mots. Puis montre que cette peur est logique et compréhensible — sans la minimiser.",
+  "blocage_principal": "Son blocage numéro 1 identifié à travers ses réponses. 1 phrase précise.",
+  "question_cle": "UNE question qui le/la fait réfléchir sur ce qui le/la sépare vraiment de sa vie rêvée. Pas rhétorique — une vraie question inconfortable.",
+  "verdict": "oui | bientot | non",
+  "verdict_raison": "2-3 phrases qui expliquent pourquoi Code Liberté est OU n'est pas le bon véhicule pour atteindre SA vision spécifique. Utilise ses exemples concrets.",
+  "code_liberte_lien": "Comment Code Liberté lui permet d'atteindre SA vision spécifique — pas une description générique de la formation. Connecte les points entre ce qu'il/elle veut et ce que Code Liberté offre concrètement.",
+  "premier_pas": "Le premier pas concret qu'il/elle peut faire AUJOURD'HUI — spécifique à sa situation.",
+  "phrase_miroir": "LA phrase qui va le/la retourner — qui résume tout en une ligne. Utilise ses propres mots. C'est la phrase qu'il/elle va screenshotter.",
+  "seller_notes": {
+    "temperature": "froid | tiede | chaud",
+    "blocage_dominant": "arnaque | methode | budget | regard | discipline | confiance",
+    "urgence": "faible | moyenne | forte",
+    "action_recommandee": "description courte de l'action à faire",
+    "ton_a_adopter": "description du ton"
+  }
+}`;
+    }
 
     // ── SECTION 3: BLOCS CONFIG + VERDICT CONFIG ──
 
