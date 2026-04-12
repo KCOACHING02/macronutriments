@@ -93,6 +93,44 @@
     ];
 
     // ── SECTION 2: SYSTEM PROMPT IA ──
+    function buildPrompt(answers) {
+      const formatted = answers.map((a, i) => {
+        const q = questions[i];
+        return `[${q.emoji} ${q.label}]\nQuestion : ${q.text}\nR\u00e9ponse : ${a}`;
+      }).join("\n\n");
+
+      return `Tu es un expert en psychologie de la motivation et en business en ligne. Tu analyses les r\u00e9ponses d'une personne \u00e0 un questionnaire de vision de vie pour lui produire un bilan personnalis\u00e9 percutant.
+
+R\u00c9PONSES DE LA PERSONNE :
+${formatted}
+
+INSTRUCTIONS POUR LE BILAN :
+Tu dois produire un bilan JSON avec exactement cette structure. R\u00e9ponds UNIQUEMENT avec le JSON, rien d'autre.
+
+{
+  "prenom_suppose": "Pr\u00e9nom suppos\u00e9 ou 'toi' si impossible \u00e0 deviner",
+  "vision_titre": "Un titre court et percutant qui r\u00e9sume SA vision de vie en 8 mots max \u2014 utilise SES propres mots",
+  "vision_portrait": "2-3 phrases qui d\u00e9crivent sa vie r\u00eav\u00e9e avec SES propres mots exacts. Commence par 'Tu veux\u2026' et sois ultra pr\u00e9cis(e) avec ce qu'il/elle a \u00e9crit. Effet miroir total.",
+  "ecart_brutal": "1-2 phrases qui nomment l'\u00e9cart entre sa vie actuelle et sa vision. Direct, sans filtre. Pas de jugement mais pas de complaisance. Utilise ses chiffres et sa situation r\u00e9elle.",
+  "contradiction": "Si il/elle passe du temps sur son t\u00e9l\u00e9phone mais dit manquer de temps \u2014 nomme cette contradiction directement. Sinon laisse vide.",
+  "force_cachee": "Ce que ses r\u00e9ponses r\u00e9v\u00e8lent sur ses forces r\u00e9elles qu'il/elle ne voit pas. Bas\u00e9 sur ce qu'il/elle a \u00e9crit \u2014 pas des g\u00e9n\u00e9ralit\u00e9s.",
+  "peur_nommee": "Reformule sa peur principale avec ses propres mots. Puis montre que cette peur est logique et compr\u00e9hensible \u2014 sans la minimiser.",
+  "blocage_principal": "Son blocage num\u00e9ro 1 identifi\u00e9 \u00e0 travers ses r\u00e9ponses. 1 phrase pr\u00e9cise.",
+  "question_cle": "UNE question qui le/la fait r\u00e9fl\u00e9chir sur ce qui le/la s\u00e9pare vraiment de sa vie r\u00eav\u00e9e. Pas rh\u00e9torique \u2014 une vraie question inconfortable.",
+  "verdict": "oui | bientot | non",
+  "verdict_raison": "2-3 phrases qui expliquent pourquoi Code Libert\u00e9 est OU n'est pas le bon v\u00e9hicule pour atteindre SA vision sp\u00e9cifique. Utilise ses exemples concrets.",
+  "code_liberte_lien": "Comment Code Libert\u00e9 lui permet d'atteindre SA vision sp\u00e9cifique \u2014 pas une description g\u00e9n\u00e9rique de la formation. Connecte les points entre ce qu'il/elle veut et ce que Code Libert\u00e9 offre concr\u00e8tement.",
+  "premier_pas": "Le premier pas concret qu'il/elle peut faire AUJOURD'HUI \u2014 sp\u00e9cifique \u00e0 sa situation.",
+  "phrase_miroir": "LA phrase qui va le/la retourner \u2014 qui r\u00e9sume tout en une ligne. Utilise ses propres mots. C'est la phrase qu'il/elle va screenshotter.",
+  "seller_notes": {
+    "temperature": "froid | tiede | chaud",
+    "blocage_dominant": "arnaque | methode | budget | regard | discipline | confiance",
+    "urgence": "faible | moyenne | forte",
+    "action_recommandee": "description courte de l'action \u00e0 faire",
+    "ton_a_adopter": "description du ton"
+  }
+}`;
+    }
 
     // ── SECTION 3: BLOCS CONFIG + VERDICT CONFIG ──
 
