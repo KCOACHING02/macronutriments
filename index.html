@@ -307,7 +307,7 @@
       const formatted = answers.map((optIdx, qIdx) => {
         const q = questions[qIdx];
         const opt = q.options[optIdx];
-        return `Q${qIdx + 1} : ${q.text}\n→ ${opt.emoji} ${opt.label}`;
+        return `Q${qIdx + 1} : ${q.text}\n→ ${opt.label}`;
       }).join("\n\n");
 
       // Top 5 dimensions (les plus saillantes)
@@ -320,7 +320,9 @@
 
       return `Tu es un coach expert en psychologie comportementale et reconversion professionnelle. Tu produis un bilan ULTRA personnalisé et diagnostique pour une femme qui vient de répondre à 15 questions à choix multiples.
 
-ARCHÉTYPE DÉTECTÉ : ${arch.emoji} ${arch.nom}
+IMPORTANT : N'UTILISE AUCUN EMOJI dans ta réponse JSON. Uniquement du texte pur.
+
+ARCHÉTYPE DÉTECTÉ : ${arch.nom}
 TAGLINE OFFICIELLE : ${arch.tagline}
 DESCRIPTION DU PROFIL : ${arch.description}
 
@@ -479,7 +481,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                 <div style={S.archetypeGrid}>
                   {Object.values(ARCHETYPES).map(a => (
                     <div key={a.id} style={{...S.archetypeMini, background: a.accent}}>
-                      <span style={S.archetypeMiniEmoji}>{a.emoji}</span>
                       <span style={{...S.archetypeMiniName, color: a.color}}>{a.nom}</span>
                     </div>
                   ))}
@@ -521,7 +522,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                         }}
                         onClick={() => handleSelect(i)}
                       >
-                        <span style={S.optEmoji}>{opt.emoji}</span>
                         <span style={S.optLabel}>{opt.label}</span>
                       </button>
                     );
@@ -564,7 +564,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                     {/* Hero archétype */}
                     <div style={{...S.archHero, background: archetype.accent}}>
                       <p style={{...S.archKicker, color: archetype.color}}>TON ARCHÉTYPE</p>
-                      <span style={S.archEmojiBig}>{archetype.emoji}</span>
                       <h2 style={{...S.archName, color: archetype.color}}>{archetype.nom}</h2>
                       <p style={{...S.archTagline, color: archetype.color}}>« {archetype.tagline} »</p>
                     </div>
@@ -577,7 +576,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
                     {/* Pattern invisible */}
                     <div style={{...S.section, background: "#FAEAE0"}}>
-                      <p style={{...S.sectionLabel, color: "#C04E2C"}}>🔍 LE PATTERN QUE TU NE VOIS PAS</p>
+                      <p style={{...S.sectionLabel, color: "#C04E2C"}}>LE PATTERN QUE TU NE VOIS PAS</p>
                       <p style={{...S.sectionTxt, fontStyle: "italic"}}>{bilan.pattern_invisible}</p>
                     </div>
 
@@ -589,13 +588,13 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
                     {/* Déclic */}
                     <div style={S.section}>
-                      <p style={S.sectionLabel}>✨ TON DÉCLIC</p>
+                      <p style={S.sectionLabel}>TON DÉCLIC</p>
                       <p style={S.sectionTxt}>{bilan.declic_specifique}</p>
                     </div>
 
                     {/* Premier pas */}
                     <div style={{...S.section, background: "#E5EFEA"}}>
-                      <p style={{...S.sectionLabel, color: "#5C8270"}}>🌱 TON PREMIER PAS CETTE SEMAINE</p>
+                      <p style={{...S.sectionLabel, color: "#5C8270"}}>TON PREMIER PAS CETTE SEMAINE</p>
                       <p style={S.sectionTxt}>{bilan.premier_pas}</p>
                     </div>
 
@@ -621,7 +620,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                     {/* Seller notes (privé) */}
                     {bilan.seller_notes && (
                       <details style={S.seller}>
-                        <summary style={S.sellerSum}>📊 Données vendeur (privé)</summary>
+                        <summary style={S.sellerSum}>Données vendeur (privé)</summary>
                         <div style={S.sellerBody}>
                           {Object.entries(bilan.seller_notes).map(([k, v]) => (
                             <div key={k} style={S.sellerRow}>
@@ -705,14 +704,14 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         marginTop: 8,
       },
       archetypeMini: {
-        padding: "14px 14px",
+        padding: "16px 16px",
         borderRadius: 14,
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        gap: 6,
+        justifyContent: "center",
+        minHeight: 64,
       },
-      archetypeMiniEmoji: { fontSize: 24 },
       archetypeMiniName: {
         fontFamily: "'Fraunces', serif",
         fontSize: 14,
@@ -791,7 +790,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         borderColor: "#C04E2C",
         boxShadow: "0 4px 18px rgba(192,78,44,0.15)",
       },
-      optEmoji: { fontSize: 26, flexShrink: 0 },
       optLabel: {
         fontSize: 15,
         fontWeight: 500,
@@ -844,7 +842,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         letterSpacing: "0.22em",
         textTransform: "uppercase",
       },
-      archEmojiBig: { fontSize: 64, lineHeight: 1, marginTop: 4 },
       archName: {
         fontFamily: "'Fraunces', serif",
         fontSize: 36,
