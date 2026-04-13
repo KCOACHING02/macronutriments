@@ -371,13 +371,17 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
     // ── SECTION 5: APP COMPONENT ──
     function App() {
-      const [step, setStep] = useState("intro"); // intro | quiz | loading | result
+      const [step, setStep] = useState("intro"); // intro | quiz | loading | email | result
       const [current, setCurrent] = useState(0);
       const [answers, setAnswers] = useState(Array(questions.length).fill(null));
       const [bilan, setBilan] = useState(null);
       const [archetype, setArchetype] = useState(null);
       const [leaving, setLeaving] = useState(false);
       const [loadingMsg, setLoadingMsg] = useState(0);
+      const [email, setEmail] = useState("");
+      const [prenom, setPrenom] = useState("");
+      const [emailSubmitting, setEmailSubmitting] = useState(false);
+      const [shareCopied, setShareCopied] = useState(false);
 
       const q = questions[current];
       const progress = ((current) / questions.length) * 100;
@@ -447,7 +451,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
           const clean = text.replace(/```json|```/g, "").trim();
           const parsed = JSON.parse(clean);
           setBilan(parsed);
-          setStep("result");
+          setStep("email"); // → étape capture email avant le bilan complet
         } catch (err) {
           console.error(err);
           setBilan({ error: true, errorMsg: err.message });
@@ -455,11 +459,76 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         }
       };
 
+      const submitEmail = async (e) => {
+        e.preventDefault();
+        if (!email.includes("@")) return;
+        setEmailSubmitting(true);
+        try {
+          await fetch("/api/lead", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              prenom,
+              archetype: archetype?.nom,
+              temperature: bilan?.seller_notes?.temperature,
+              blocage_dominant: bilan?.seller_notes?.blocage_dominant,
+            }),
+          });
+        } catch (err) {
+          console.error("Lead submit failed:", err);
+        }
+        setEmailSubmitting(false);
+        go(() => setStep("result"));
+      };
+
       const restart = () => go(() => {
         setStep("intro"); setCurrent(0);
         setAnswers(Array(questions.length).fill(null));
         setBilan(null); setArchetype(null); setLoadingMsg(0);
+        setEmail(""); setPrenom("");
       });
+
+      const handleShare = async (platform) => {
+        const url = window.location.href;
+        const text = `Je viens de découvrir mon archétype : « ${archetype?.nom} ». Découvre le tien :`;
+        if (platform === "whatsapp") {
+          window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, "_blank");
+        } else if (platform === "copy") {
+          await navigator.clipboard.writeText(text + " " + url);
+          setShareCopied(true);
+          setTimeout(() => setShareCopied(false), 2000);
+        } else if (platform === "instagram") {
+          await navigator.clipboard.writeText(text + " " + url);
+          setShareCopied(true);
+          setTimeout(() => setShareCopied(false), 2000);
+          alert("Lien copié ! Colle-le dans ta story Instagram");
+        }
+      };
+
+      // CTA dynamique selon la température
+      const getDynamicCTA = () => {
+        const temp = bilan?.seller_notes?.temperature?.toLowerCase();
+        if (temp === "chaud") {
+          return {
+            label: "Rejoindre Code Liberté maintenant →",
+            url: "https://brilleetvibre.com",
+            sub: "Pour les femmes prêtes à passer à l'action",
+          };
+        }
+        if (temp === "tiede" || temp === "tiède") {
+          return {
+            label: "Réserver un appel découverte gratuit →",
+            url: "https://brilleetvibre.com",
+            sub: "15 minutes, sans engagement, pour valider que c'est fait pour toi",
+          };
+        }
+        return {
+          label: "Découvrir Code Liberté à mon rythme →",
+          url: "https://brilleetvibre.com",
+          sub: "Lis les témoignages de femmes qui ont douté avant toi",
+        };
+      };
 
       return (
         <div style={S.root}>
@@ -549,6 +618,57 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
             </div>
           )}
 
+          {/* ─── EMAIL CAPTURE ─── */}
+          {step === "email" && bilan && !bilan.error && archetype && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                <p style={S.kicker}>RÉSULTAT DE TON BILAN</p>
+                <h1 style={{...S.h1, fontSize: 38}}>Ton archétype est<br/><em style={S.em}>{archetype.nom}</em></h1>
+                <div style={S.heroLine}/>
+
+                <div style={{...S.archHero, background: archetype.accent, marginTop: 8}}>
+                  <p style={{...S.archTagline, color: archetype.color, fontSize: 18}}>« {archetype.tagline} »</p>
+                </div>
+
+                <div style={S.emailBox}>
+                  <p style={S.emailLabel}>TON DIAGNOSTIC COMPLET EST PRÊT</p>
+                  <h3 style={S.emailTitle}>Où veux-tu que je te l'envoie ?</h3>
+                  <p style={S.emailDesc}>
+                    8 sections personnalisées : ton portrait, le pattern que tu répètes sans le voir, ta fausse croyance, ton déclic spécifique, ton premier pas. Conçu rien que pour toi.
+                  </p>
+
+                  <form onSubmit={submitEmail} style={S.emailForm}>
+                    <input
+                      type="text"
+                      placeholder="Ton prénom"
+                      value={prenom}
+                      onChange={e => setPrenom(e.target.value)}
+                      style={S.emailInput}
+                      required
+                    />
+                    <input
+                      type="email"
+                      placeholder="ton@email.com"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      style={S.emailInput}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="btn-main"
+                      disabled={emailSubmitting}
+                      style={{opacity: emailSubmitting ? 0.6 : 1}}
+                    >
+                      {emailSubmitting ? "Un instant…" : "Recevoir mon bilan complet →"}
+                    </button>
+                  </form>
+                  <p style={S.emailNote}>Confidentiel · Pas de spam · Désinscription en 1 clic</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ─── RESULT ─── */}
           {step === "result" && bilan && (
             <div className={`pg ${leaving ? "lv" : "en"}`}>
@@ -604,17 +724,37 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                       <p style={S.phraseCredit}>— Ton bilan Code Liberté</p>
                     </div>
 
-                    {/* Code Liberté */}
+                    {/* Code Liberté avec CTA dynamique */}
                     <div style={{...S.clBox, borderColor: archetype.color}}>
                       <p style={{...S.clLabel, color: archetype.color}}>POURQUOI CODE LIBERTÉ POUR TOI</p>
                       <p style={S.clTxt}>{bilan.code_liberte_lien}</p>
-                      <button
-                        className="btn-cta"
-                        style={{background: archetype.color}}
-                        onClick={() => window.open("https://brilleetvibre.com", "_blank")}
-                      >
-                        Découvrir Code Liberté →
-                      </button>
+                      {(() => {
+                        const cta = getDynamicCTA();
+                        return (
+                          <>
+                            <button
+                              className="btn-cta"
+                              style={{background: archetype.color}}
+                              onClick={() => window.open(cta.url, "_blank")}
+                            >
+                              {cta.label}
+                            </button>
+                            <p style={S.ctaSub}>{cta.sub}</p>
+                          </>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Bouton de partage */}
+                    <div style={S.shareBox}>
+                      <p style={S.shareLabel}>Tu t'es reconnue ? Envoie ton archétype à 3 amies</p>
+                      <div style={S.shareBtns}>
+                        <button className="share-btn" onClick={() => handleShare("whatsapp")}>WhatsApp</button>
+                        <button className="share-btn" onClick={() => handleShare("instagram")}>Instagram</button>
+                        <button className="share-btn" onClick={() => handleShare("copy")}>
+                          {shareCopied ? "Lien copié ✓" : "Copier le lien"}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Seller notes (privé) */}
@@ -948,6 +1088,89 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         color: "#2D1F1A",
         marginBottom: 18,
       },
+      ctaSub: {
+        fontSize: 12,
+        color: "#A89A90",
+        textAlign: "center",
+        marginTop: 12,
+        fontStyle: "italic",
+      },
+
+      // Email capture
+      emailBox: {
+        background: "#FFF",
+        border: "1.5px solid #EFE4D9",
+        borderRadius: 22,
+        padding: "28px 24px",
+        marginTop: 12,
+      },
+      emailLabel: {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.18em",
+        color: "#C04E2C",
+        textTransform: "uppercase",
+        marginBottom: 12,
+      },
+      emailTitle: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 26,
+        fontWeight: 600,
+        lineHeight: 1.2,
+        color: "#2D1F1A",
+        marginBottom: 14,
+      },
+      emailDesc: {
+        fontSize: 14,
+        lineHeight: 1.65,
+        color: "#5C4A40",
+        marginBottom: 22,
+      },
+      emailForm: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+      },
+      emailInput: {
+        width: "100%",
+        background: "#FAF5EF",
+        border: "1.5px solid #EFE4D9",
+        borderRadius: 14,
+        padding: "16px 18px",
+        fontSize: 15,
+        fontFamily: "'Inter', sans-serif",
+        color: "#2D1F1A",
+        outline: "none",
+        transition: "border-color 0.18s",
+      },
+      emailNote: {
+        fontSize: 11,
+        color: "#A89A90",
+        textAlign: "center",
+        marginTop: 14,
+      },
+
+      // Share
+      shareBox: {
+        background: "#FFF6EE",
+        border: "1px solid #F4D9CE",
+        borderRadius: 18,
+        padding: "20px 22px",
+        textAlign: "center",
+      },
+      shareLabel: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 15,
+        fontStyle: "italic",
+        color: "#5C4A40",
+        marginBottom: 14,
+      },
+      shareBtns: {
+        display: "flex",
+        gap: 8,
+        justifyContent: "center",
+        flexWrap: "wrap",
+      },
 
       // Seller notes
       seller: {
@@ -1135,6 +1358,30 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
       }
 
       details[open] summary { color: #2D1F1A; }
+
+      input:focus {
+        border-color: #C04E2C !important;
+        background: #FFF !important;
+      }
+
+      .share-btn {
+        background: #FFF;
+        border: 1.5px solid #F4D9CE;
+        color: #C04E2C;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s;
+      }
+      .share-btn:hover {
+        background: #C04E2C;
+        color: #FFF;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(192,78,44,0.25);
+      }
     `;
 
     // ── RENDER ──
