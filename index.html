@@ -641,6 +641,379 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
     }
 
     // ── SECTION 6: STYLES (S object) ──
+    const S = {
+      root: {
+        minHeight: "100vh",
+        background: "#FAF5EF",
+        display: "flex",
+        justifyContent: "center",
+        padding: "0 20px 80px",
+        fontFamily: "'Inter', sans-serif",
+        color: "#2D1F1A",
+      },
+      wrap: {
+        width: "100%",
+        maxWidth: 540,
+        paddingTop: 56,
+        display: "flex",
+        flexDirection: "column",
+        gap: 22,
+      },
+
+      // INTRO
+      kicker: {
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: "0.22em",
+        color: "#C04E2C",
+        textTransform: "uppercase",
+      },
+      h1: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 48,
+        fontWeight: 700,
+        lineHeight: 1.05,
+        letterSpacing: "-0.02em",
+        color: "#2D1F1A",
+      },
+      em: {
+        fontStyle: "italic",
+        fontWeight: 600,
+        color: "#C04E2C",
+      },
+      heroLine: {
+        width: 48,
+        height: 3,
+        background: "#C04E2C",
+        borderRadius: 2,
+        margin: "4px 0",
+      },
+      lead: {
+        fontSize: 16,
+        lineHeight: 1.7,
+        color: "#5C4A40",
+        fontWeight: 400,
+      },
+      archetypeGrid: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 10,
+        marginTop: 8,
+      },
+      archetypeMini: {
+        padding: "14px 14px",
+        borderRadius: 14,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: 6,
+      },
+      archetypeMiniEmoji: { fontSize: 24 },
+      archetypeMiniName: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 14,
+        fontWeight: 600,
+        lineHeight: 1.2,
+      },
+      smallNote: {
+        fontSize: 12,
+        color: "#A89A90",
+        textAlign: "center",
+        marginTop: 4,
+      },
+
+      // QUIZ
+      quizTop: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      },
+      quizBrand: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 13,
+        fontStyle: "italic",
+        color: "#A89A90",
+      },
+      qNum: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 18,
+        fontWeight: 600,
+        color: "#2D1F1A",
+      },
+      qOf: { color: "#A89A90", fontWeight: 400 },
+      track: {
+        height: 4,
+        background: "#EFE4D9",
+        borderRadius: 4,
+        overflow: "hidden",
+      },
+      fill: {
+        height: "100%",
+        background: "linear-gradient(90deg, #C04E2C, #D67B5C)",
+        borderRadius: 4,
+        transition: "width 0.5s ease",
+      },
+      qText: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 28,
+        fontWeight: 600,
+        lineHeight: 1.25,
+        letterSpacing: "-0.01em",
+        color: "#2D1F1A",
+        marginTop: 8,
+        marginBottom: 4,
+      },
+      optionsWrap: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+      },
+      optBtn: {
+        background: "#FFF",
+        border: "1.5px solid #EFE4D9",
+        borderRadius: 16,
+        padding: "18px 18px",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        cursor: "pointer",
+        textAlign: "left",
+        width: "100%",
+        fontFamily: "'Inter', sans-serif",
+        transition: "all 0.18s ease",
+      },
+      optBtnSelected: {
+        background: "#FFF6EE",
+        borderColor: "#C04E2C",
+        boxShadow: "0 4px 18px rgba(192,78,44,0.15)",
+      },
+      optEmoji: { fontSize: 26, flexShrink: 0 },
+      optLabel: {
+        fontSize: 15,
+        fontWeight: 500,
+        lineHeight: 1.4,
+        color: "#2D1F1A",
+      },
+
+      // LOADING
+      loadingWrap: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 18,
+        paddingTop: 140,
+        textAlign: "center",
+        maxWidth: 320,
+      },
+      loadingTitle: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 26,
+        fontWeight: 600,
+        color: "#2D1F1A",
+        marginTop: 12,
+      },
+      loadingMsg: {
+        fontSize: 14,
+        color: "#C04E2C",
+        fontWeight: 600,
+        minHeight: 20,
+      },
+      loadingNote: {
+        fontSize: 12,
+        color: "#A89A90",
+        lineHeight: 1.6,
+      },
+
+      // RESULT - Hero archétype
+      archHero: {
+        borderRadius: 24,
+        padding: "32px 24px 36px",
+        textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 8,
+      },
+      archKicker: {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.22em",
+        textTransform: "uppercase",
+      },
+      archEmojiBig: { fontSize: 64, lineHeight: 1, marginTop: 4 },
+      archName: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 36,
+        fontWeight: 700,
+        lineHeight: 1.1,
+        letterSpacing: "-0.02em",
+        marginTop: 4,
+      },
+      archTagline: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 16,
+        fontStyle: "italic",
+        fontWeight: 500,
+        lineHeight: 1.4,
+        marginTop: 6,
+        opacity: 0.85,
+      },
+
+      // Sections
+      section: {
+        background: "#FFF",
+        border: "1px solid #EFE4D9",
+        borderRadius: 18,
+        padding: "22px 22px",
+      },
+      sectionLabel: {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.16em",
+        color: "#A89A90",
+        textTransform: "uppercase",
+        marginBottom: 12,
+      },
+      sectionTxt: {
+        fontSize: 16,
+        lineHeight: 1.65,
+        color: "#2D1F1A",
+        fontWeight: 400,
+      },
+      sectionDark: {
+        background: "#2D1F1A",
+        borderRadius: 18,
+        padding: "22px 22px",
+      },
+      sectionLabelDark: {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.16em",
+        color: "#D67B5C",
+        textTransform: "uppercase",
+        marginBottom: 12,
+      },
+      sectionTxtDark: {
+        fontSize: 17,
+        lineHeight: 1.6,
+        color: "#FAF5EF",
+        fontFamily: "'Fraunces', serif",
+        fontStyle: "italic",
+        fontWeight: 500,
+      },
+
+      // Phrase miroir
+      phraseBox: {
+        background: "linear-gradient(135deg, #FFF6EE, #F4D9CE)",
+        border: "1.5px solid #C04E2C",
+        borderRadius: 22,
+        padding: "30px 24px",
+        textAlign: "center",
+      },
+      phraseTxt: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: 22,
+        fontWeight: 600,
+        fontStyle: "italic",
+        lineHeight: 1.35,
+        color: "#2D1F1A",
+        letterSpacing: "-0.01em",
+      },
+      phraseCredit: {
+        fontSize: 11,
+        color: "#A89A90",
+        marginTop: 14,
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+      },
+
+      // Code Liberté box
+      clBox: {
+        background: "#FFF",
+        border: "2px solid",
+        borderRadius: 20,
+        padding: "26px 22px",
+      },
+      clLabel: {
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
+        marginBottom: 12,
+      },
+      clTxt: {
+        fontSize: 15,
+        lineHeight: 1.65,
+        color: "#2D1F1A",
+        marginBottom: 18,
+      },
+
+      // Seller notes
+      seller: {
+        border: "1px dashed #D9CABE",
+        borderRadius: 14,
+        padding: "14px 16px",
+      },
+      sellerSum: {
+        fontSize: 12,
+        color: "#A89A90",
+        cursor: "pointer",
+        userSelect: "none",
+        fontWeight: 500,
+      },
+      sellerBody: {
+        marginTop: 14,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      },
+      sellerRow: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        borderBottom: "1px solid #EFE4D9",
+        paddingBottom: 8,
+      },
+      sellerKey: {
+        fontSize: 10,
+        color: "#A89A90",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+      },
+      sellerVal: {
+        fontSize: 13,
+        fontWeight: 600,
+        color: "#2D1F1A",
+      },
+
+      // Error
+      errorBox: {
+        background: "#FFF",
+        border: "1px solid #E5C5BC",
+        borderRadius: 16,
+        padding: "22px",
+      },
+      errorTxt: {
+        fontSize: 15,
+        color: "#5C4A40",
+        lineHeight: 1.6,
+      },
+      errorDetail: {
+        fontSize: 12,
+        color: "#A89A90",
+        marginTop: 8,
+        wordBreak: "break-all",
+      },
+
+      footer: {
+        textAlign: "center",
+        fontSize: 11,
+        color: "#A89A90",
+        marginTop: 8,
+        fontFamily: "'Fraunces', serif",
+        fontStyle: "italic",
+      },
+    };
 
     // ── SECTION 7: CSS STRING ──
 
