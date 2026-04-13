@@ -371,16 +371,13 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
     // ── SECTION 5: APP COMPONENT ──
     function App() {
-      const [step, setStep] = useState("intro"); // intro | quiz | loading | email | result
+      const [step, setStep] = useState("intro"); // intro | quiz | loading | result
       const [current, setCurrent] = useState(0);
       const [answers, setAnswers] = useState(Array(questions.length).fill(null));
       const [bilan, setBilan] = useState(null);
       const [archetype, setArchetype] = useState(null);
       const [leaving, setLeaving] = useState(false);
       const [loadingMsg, setLoadingMsg] = useState(0);
-      const [email, setEmail] = useState("");
-      const [prenom, setPrenom] = useState("");
-      const [emailSubmitting, setEmailSubmitting] = useState(false);
       const [shareCopied, setShareCopied] = useState(false);
 
       const q = questions[current];
@@ -451,7 +448,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
           const clean = text.replace(/```json|```/g, "").trim();
           const parsed = JSON.parse(clean);
           setBilan(parsed);
-          setStep("email"); // → étape capture email avant le bilan complet
+          setStep("result");
         } catch (err) {
           console.error(err);
           setBilan({ error: true, errorMsg: err.message });
@@ -459,34 +456,10 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         }
       };
 
-      const submitEmail = async (e) => {
-        e.preventDefault();
-        if (!email.includes("@")) return;
-        setEmailSubmitting(true);
-        try {
-          await fetch("/api/lead", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email,
-              prenom,
-              archetype: archetype?.nom,
-              temperature: bilan?.seller_notes?.temperature,
-              blocage_dominant: bilan?.seller_notes?.blocage_dominant,
-            }),
-          });
-        } catch (err) {
-          console.error("Lead submit failed:", err);
-        }
-        setEmailSubmitting(false);
-        go(() => setStep("result"));
-      };
-
       const restart = () => go(() => {
         setStep("intro"); setCurrent(0);
         setAnswers(Array(questions.length).fill(null));
         setBilan(null); setArchetype(null); setLoadingMsg(0);
-        setEmail(""); setPrenom("");
       });
 
       const handleShare = async (platform) => {
@@ -618,56 +591,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
             </div>
           )}
 
-          {/* ─── EMAIL CAPTURE ─── */}
-          {step === "email" && bilan && !bilan.error && archetype && (
-            <div className={`pg ${leaving ? "lv" : "en"}`}>
-              <div style={S.wrap}>
-                <p style={S.kicker}>RÉSULTAT DE TON BILAN</p>
-                <h1 style={{...S.h1, fontSize: 38}}>Ton archétype est<br/><em style={S.em}>{archetype.nom}</em></h1>
-                <div style={S.heroLine}/>
-
-                <div style={{...S.archHero, background: archetype.accent, marginTop: 8}}>
-                  <p style={{...S.archTagline, color: archetype.color, fontSize: 18}}>« {archetype.tagline} »</p>
-                </div>
-
-                <div style={S.emailBox}>
-                  <p style={S.emailLabel}>TON DIAGNOSTIC COMPLET EST PRÊT</p>
-                  <h3 style={S.emailTitle}>Où veux-tu que je te l'envoie ?</h3>
-                  <p style={S.emailDesc}>
-                    8 sections personnalisées : ton portrait, le pattern que tu répètes sans le voir, ta fausse croyance, ton déclic spécifique, ton premier pas. Conçu rien que pour toi.
-                  </p>
-
-                  <form onSubmit={submitEmail} style={S.emailForm}>
-                    <input
-                      type="text"
-                      placeholder="Ton prénom"
-                      value={prenom}
-                      onChange={e => setPrenom(e.target.value)}
-                      style={S.emailInput}
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="ton@email.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      style={S.emailInput}
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="btn-main"
-                      disabled={emailSubmitting}
-                      style={{opacity: emailSubmitting ? 0.6 : 1}}
-                    >
-                      {emailSubmitting ? "Un instant…" : "Recevoir mon bilan complet →"}
-                    </button>
-                  </form>
-                  <p style={S.emailNote}>Confidentiel · Pas de spam · Désinscription en 1 clic</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ─── RESULT ─── */}
           {step === "result" && bilan && (
@@ -1094,60 +1017,6 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         textAlign: "center",
         marginTop: 12,
         fontStyle: "italic",
-      },
-
-      // Email capture
-      emailBox: {
-        background: "#FFF",
-        border: "1.5px solid #EFE4D9",
-        borderRadius: 22,
-        padding: "28px 24px",
-        marginTop: 12,
-      },
-      emailLabel: {
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: "0.18em",
-        color: "#C04E2C",
-        textTransform: "uppercase",
-        marginBottom: 12,
-      },
-      emailTitle: {
-        fontFamily: "'Fraunces', serif",
-        fontSize: 26,
-        fontWeight: 600,
-        lineHeight: 1.2,
-        color: "#2D1F1A",
-        marginBottom: 14,
-      },
-      emailDesc: {
-        fontSize: 14,
-        lineHeight: 1.65,
-        color: "#5C4A40",
-        marginBottom: 22,
-      },
-      emailForm: {
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      },
-      emailInput: {
-        width: "100%",
-        background: "#FAF5EF",
-        border: "1.5px solid #EFE4D9",
-        borderRadius: 14,
-        padding: "16px 18px",
-        fontSize: 15,
-        fontFamily: "'Inter', sans-serif",
-        color: "#2D1F1A",
-        outline: "none",
-        transition: "border-color 0.18s",
-      },
-      emailNote: {
-        fontSize: 11,
-        color: "#A89A90",
-        textAlign: "center",
-        marginTop: 14,
       },
 
       // Share
