@@ -232,6 +232,71 @@
     };
 
     // ── SECTION 3: SCORING LOGIC ──
+    function computeScores(answers) {
+      // answers = [optionIndex, optionIndex, ...] (un index par question)
+      const scores = {
+        ambition: 0, urgence: 0, douleur: 0, discipline: 0, confiance: 0,
+        vision: 0, action: 0, scepticisme: 0, ent_toxique: 0, arg_peur: 0,
+        bloc_methode: 0, bloc_argent: 0, bloc_entourage: 0, bloc_confiance: 0,
+        bloc_discipline: 0, valeur_famille: 0, valeur_liberte: 0, valeur_creation: 0,
+        force_resilience: 0, force_creativite: 0, force_empathie: 0, force_apprentissage: 0,
+      };
+
+      answers.forEach((optIdx, qIdx) => {
+        const opt = questions[qIdx]?.options[optIdx];
+        if (!opt) return;
+        Object.entries(opt.s || {}).forEach(([key, val]) => {
+          scores[key] = (scores[key] || 0) + val;
+        });
+      });
+
+      return scores;
+    }
+
+    function detectArchetype(scores) {
+      // On calcule un "match score" pour chaque archétype
+      const matches = {
+        reveur_piege:
+          scores.ambition * 2 + scores.urgence * 2 + scores.douleur -
+          scores.action - scores.discipline,
+        sceptique_brule:
+          scores.scepticisme * 3 + scores.bloc_confiance * 2 -
+          scores.confiance + scores.arg_peur,
+        prete_a_partir:
+          scores.action * 2 + scores.vision * 2 + scores.discipline +
+          scores.confiance - scores.scepticisme,
+        perdue_confortable:
+          -scores.urgence * 2 - scores.vision + scores.douleur * 0.5 -
+          scores.ambition,
+        prisonniere_sociale:
+          scores.ent_toxique * 3 + scores.bloc_entourage * 2 +
+          scores.ambition - scores.confiance,
+        hyperactive_dispersee:
+          scores.bloc_discipline * 2 - scores.discipline +
+          scores.force_creativite + Math.max(0, scores.action),
+      };
+
+      // L'archétype gagnant
+      const winner = Object.entries(matches).reduce((best, [id, score]) =>
+        score > best.score ? { id, score } : best
+      , { id: "perdue_confortable", score: -Infinity });
+
+      return { archetype: winner.id, matches, scores };
+    }
+
+    // Trouve le blocage dominant (pour les seller_notes)
+    function dominantBlocage(scores) {
+      const blocs = {
+        methode: scores.bloc_methode,
+        argent: scores.bloc_argent,
+        entourage: scores.bloc_entourage,
+        confiance: scores.bloc_confiance,
+        discipline: scores.bloc_discipline,
+      };
+      return Object.entries(blocs).reduce((best, [k, v]) =>
+        v > best.v ? { k, v } : best
+      , { k: "methode", v: -Infinity }).k;
+    }
 
     // ── SECTION 4: SYSTEM PROMPT IA ──
 
