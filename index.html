@@ -609,7 +609,11 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                     <div style={{...S.clBox, borderColor: archetype.color}}>
                       <p style={{...S.clLabel, color: archetype.color}}>POURQUOI CODE LIBERTÉ POUR TOI</p>
                       <p style={S.clTxt}>{bilan.code_liberte_lien}</p>
-                      <button className="btn-cta" style={{background: archetype.color}}>
+                      <button
+                        className="btn-cta"
+                        style={{background: archetype.color}}
+                        onClick={() => window.open("https://brilleetvibre.com", "_blank")}
+                      >
                         Découvrir Code Liberté →
                       </button>
                     </div>
