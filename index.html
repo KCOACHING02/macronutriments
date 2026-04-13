@@ -387,71 +387,73 @@
     }
 
     // ── SECTION 4: SYSTEM PROMPT IA ──
-    function buildPrompt(answers, archetype, scores) {
-      const arch = ARCHETYPES[archetype];
-      const blocageDom = dominantBlocage(scores);
+    function buildPrompt(answers, voiePrincipaleId, voieAlternativeId, scores) {
+      const voiePrincipale = VOIES[voiePrincipaleId];
+      const voieAlternative = VOIES[voieAlternativeId];
 
-      // Format des réponses choisies
+      // Format des réponses choisies (utile pour l'IA pour personnaliser)
       const formatted = answers.map((optIdx, qIdx) => {
         const q = questions[qIdx];
         const opt = q.options[optIdx];
-        return `Q${qIdx + 1} : ${q.text}\n→ ${opt.label}`;
+        return `Q${qIdx + 1} (${q.bloc}) : ${q.text}\n→ ${opt.label}`;
       }).join("\n\n");
 
-      // Top 5 dimensions (les plus saillantes)
-      const topDims = Object.entries(scores)
-        .filter(([k, v]) => v !== 0)
-        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-        .slice(0, 8)
-        .map(([k, v]) => `${k}: ${v > 0 ? "+" : ""}${v}`)
+      // Top scores des voies
+      const topScores = Object.entries(scores)
+        .filter(([, v]) => v > 0)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 6)
+        .map(([k, v]) => `${k}: ${v}`)
         .join(", ");
 
-      return `Tu es un coach expert en psychologie comportementale et reconversion professionnelle. Tu produis un bilan ULTRA personnalisé et diagnostique pour une femme qui vient de répondre à 15 questions à choix multiples.
+      return `Tu es un expert en business en ligne et en orientation professionnelle. Tu viens d'analyser les réponses d'une femme à un bilan de compétences digitales (16 questions) et tu dois lui produire une recommandation ULTRA personnalisée sur la voie business qui lui correspond le mieux.
 
 IMPORTANT : N'UTILISE AUCUN EMOJI dans ta réponse JSON. Uniquement du texte pur.
 
-ARCHÉTYPE DÉTECTÉ : ${arch.nom}
-TAGLINE OFFICIELLE : ${arch.tagline}
-DESCRIPTION DU PROFIL : ${arch.description}
+VOIE PRINCIPALE DÉTECTÉE : ${voiePrincipale.nom}
+TAGLINE : ${voiePrincipale.tagline}
+DESCRIPTION DE LA VOIE : ${voiePrincipale.description}
+PROFIL IDÉAL : ${voiePrincipale.ideal_pour}
 
-DIMENSIONS PSYCHOLOGIQUES MESURÉES :
-${topDims}
+VOIE ALTERNATIVE : ${voieAlternative.nom}
+DESCRIPTION ALTERNATIVE : ${voieAlternative.description}
 
-BLOCAGE DOMINANT : ${blocageDom}
+SCORES DES VOIES (top 6) : ${topScores}
 
-RÉPONSES CHOISIES :
+RÉPONSES COMPLÈTES :
 ${formatted}
 
 ═══════════════════════════════════════
-INSTRUCTIONS CRITIQUES POUR TON BILAN :
+INSTRUCTIONS CRITIQUES :
 ═══════════════════════════════════════
 
-1. NE REFORMULE PAS ses réponses. Elle sait déjà ce qu'elle a coché.
-2. RÉVÈLE des choses qu'elle n'a JAMAIS formulées sur elle-même.
-3. NOMME le pattern inconscient qu'elle répète sans le voir.
-4. SOIS direct, presque brutal — comme une amie ultra-lucide qui dit la vérité.
-5. UTILISE le "tu" — chaud, intime, jamais condescendant.
-6. PAS de jargon coach mou ("tu mérites tellement", "tu as un potentiel énorme"). PARLE VRAI.
-7. Chaque phrase doit être SPÉCIFIQUE à son archétype, pas générique.
+1. Tu dois lui dire CONCRÈTEMENT quelle voie est faite pour elle ET POURQUOI (en utilisant SES réponses).
+2. Tu dois lui donner UNE IDÉE DE BUSINESS PRÉCISE qui combine sa passion + son savoir-faire + son style. Pas générique. Exemple : "Crée un ebook 'Cuisine sans gluten en 15 min' pour mamans débordées" — pas juste "fais un ebook".
+3. Tu dois donner un PREMIER PAS concret à faire CETTE SEMAINE.
+4. Tu dois expliquer pourquoi Code Liberté est SA rampe de lancement personnelle (en connectant à sa voie principale).
+5. Sois directe, chaude, intime. Tu utilises "tu". Pas de jargon coach mou.
+6. PAS d'emojis dans le texte.
 
 Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
 {
-  "portrait_brutal": "3-4 phrases qui dressent SON portrait psychologique. Commence par une affirmation qui la fige. Nomme ce que personne n'a osé lui dire. Sois précis avec son archétype ${arch.nom}.",
-  "pattern_invisible": "1 phrase qui décrit le pattern qu'elle répète inconsciemment. Format : 'Tu fais X parce que tu crois que Y, mais en vérité Z.' Doit être troublant de précision.",
-  "fausse_croyance": "1 phrase qui nomme la fausse croyance qui la bloque. Une phrase qu'elle n'a jamais formulée mais qui dirige sa vie. Format : 'Tu crois que [croyance], et c'est ce qui te bloque.'",
-  "declic_specifique": "2-3 phrases qui décrivent LE déclic dont elle a besoin — adapté à SON archétype ${arch.nom}. Pas un conseil générique. Une révélation.",
-  "premier_pas": "1-2 phrases : LE premier pas concret qu'elle peut faire CETTE SEMAINE. Adapté à son archétype et son blocage dominant (${blocageDom}). Doit être minuscule mais symbolique.",
-  "phrase_miroir": "LA phrase qui va la retourner. Une seule phrase, courte (max 15 mots), qui résume tout. La phrase qu'elle va screenshotter.",
-  "code_liberte_lien": "2-3 phrases qui expliquent pourquoi Code Liberté est SPÉCIFIQUEMENT le bon véhicule pour SON archétype ${arch.nom}. Pas une description générique. Connecte les points entre son blocage (${blocageDom}) et ce que Code Liberté offre.",
-  "verdict": "oui | bientot | non",
-  "verdict_raison": "1-2 phrases qui justifient le verdict. Direct.",
+  "portrait_express": "2-3 phrases qui dressent son portrait actuel. Tu cernes qui elle est, où elle en est, ce qu'elle cherche vraiment.",
+  "pourquoi_cette_voie": "3-4 phrases qui expliquent POURQUOI ${voiePrincipale.nom} est faite pour elle, en utilisant SES réponses spécifiques (sa passion, son savoir-faire, son style de travail, son objectif).",
+  "idee_business_concrete": "1 idée de business ULTRA précise et personnalisée. Format : 'Tu pourrais créer/lancer X pour Y'. Exemples : 'Tu pourrais créer un ebook \\\"Cuisine anti-inflammatoire pour femmes en périménopause\\\" et le vendre à 27€', 'Tu pourrais lancer un compte UGC spécialisé dans le soin du visage pour les marques de cosmétiques bio'. Doit combiner sa passion + son savoir-faire + son temps disponible + son objectif.",
+  "pourquoi_ca_marche_pour_toi": "2-3 phrases qui expliquent pourquoi cette idée précise correspond à elle (utilise au moins 2 de ses réponses).",
+  "premier_pas": "1-2 phrases : LE premier pas concret à faire cette semaine. Action minuscule mais déclenchante.",
+  "voie_alternative_nom": "${voieAlternative.nom}",
+  "voie_alternative_raison": "1-2 phrases : pourquoi ${voieAlternative.nom} est son plan B intéressant.",
+  "code_liberte_lien": "3-4 phrases qui expliquent pourquoi Code Liberté est LA meilleure rampe de lancement pour son profil et sa voie (${voiePrincipale.nom}). Connecte ses besoins spécifiques à ce que Code Liberté offre. Pas générique.",
+  "phrase_miroir": "LA phrase qui résume tout en une seule ligne percutante (max 15 mots). C'est la phrase qu'elle va screenshotter.",
+  "verdict": "chaud | tiede | froid",
   "seller_notes": {
-    "archetype": "${arch.nom}",
-    "temperature": "froid | tiede | chaud",
-    "blocage_dominant": "${blocageDom}",
+    "voie_principale": "${voiePrincipale.nom}",
+    "voie_alternative": "${voieAlternative.nom}",
+    "temperature": "chaud | tiede | froid",
+    "niveau_maturite": "debutante | intermediaire | avancee",
     "urgence": "faible | moyenne | forte",
-    "action_recommandee": "Quoi faire avec ce profil (court)",
+    "action_recommandee": "Quoi faire avec ce profil en vente (court)",
     "ton_a_adopter": "Comment lui parler en vente (court)"
   }
 }`;
