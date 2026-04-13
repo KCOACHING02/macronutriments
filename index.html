@@ -368,6 +368,277 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
     }
 
     // ── SECTION 5: APP COMPONENT ──
+    function App() {
+      const [step, setStep] = useState("intro"); // intro | quiz | loading | result
+      const [current, setCurrent] = useState(0);
+      const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+      const [bilan, setBilan] = useState(null);
+      const [archetype, setArchetype] = useState(null);
+      const [leaving, setLeaving] = useState(false);
+      const [loadingMsg, setLoadingMsg] = useState(0);
+
+      const q = questions[current];
+      const progress = ((current) / questions.length) * 100;
+      const currentAnswer = answers[current];
+      const allAnswered = answers.every(a => a !== null);
+
+      const LOADING_MSGS = [
+        "Analyse de tes réponses…",
+        "Identification de ton archétype…",
+        "Détection de tes patterns invisibles…",
+        "Construction de ton diagnostic…",
+        "Rédaction de ton bilan personnalisé…",
+      ];
+
+      useEffect(() => {
+        if (step === "loading") {
+          const interval = setInterval(() => {
+            setLoadingMsg(prev => (prev + 1) % LOADING_MSGS.length);
+          }, 1700);
+          return () => clearInterval(interval);
+        }
+      }, [step]);
+
+      const go = (fn) => { setLeaving(true); setTimeout(() => { fn(); setLeaving(false); }, 280); };
+
+      const handleSelect = (optIdx) => {
+        const newAnswers = [...answers];
+        newAnswers[current] = optIdx;
+        setAnswers(newAnswers);
+
+        // Auto-avance après 350ms
+        setTimeout(() => {
+          go(() => {
+            if (current + 1 < questions.length) {
+              setCurrent(current + 1);
+            } else {
+              generateBilan(newAnswers);
+            }
+          });
+        }, 350);
+      };
+
+      const handleBack = () => {
+        if (current > 0) go(() => setCurrent(current - 1));
+      };
+
+      const generateBilan = async (finalAnswers) => {
+        setStep("loading");
+        try {
+          const scores = computeScores(finalAnswers);
+          const detection = detectArchetype(scores);
+          const archId = detection.archetype;
+          setArchetype(ARCHETYPES[archId]);
+
+          const prompt = buildPrompt(finalAnswers, archId, scores);
+          const response = await fetch("/api/bilan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system: "Tu es un coach expert en psychologie comportementale. Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans aucun texte avant ou après le JSON.",
+              messages: [{ role: "user", content: prompt }],
+            }),
+          });
+          const data = await response.json();
+          if (data.error) throw new Error(data.details || data.error);
+          const text = data.content?.[0]?.text || "";
+          const clean = text.replace(/```json|```/g, "").trim();
+          const parsed = JSON.parse(clean);
+          setBilan(parsed);
+          setStep("result");
+        } catch (err) {
+          console.error(err);
+          setBilan({ error: true, errorMsg: err.message });
+          setStep("result");
+        }
+      };
+
+      const restart = () => go(() => {
+        setStep("intro"); setCurrent(0);
+        setAnswers(Array(questions.length).fill(null));
+        setBilan(null); setArchetype(null); setLoadingMsg(0);
+      });
+
+      return (
+        <div style={S.root}>
+          <style>{CSS}</style>
+
+          {/* ─── INTRO ─── */}
+          {step === "intro" && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                <p style={S.kicker}>BILAN DE VIE · CODE LIBERTÉ</p>
+                <h1 style={S.h1}>Quelle femme<br/><em style={S.em}>es-tu vraiment&nbsp;?</em></h1>
+                <div style={S.heroLine}/>
+                <p style={S.lead}>
+                  15 questions. 2 minutes. Aucun texte à écrire.
+                  <br/><br/>
+                  À la fin, tu découvres <strong>ton archétype</strong> parmi six profils — et un diagnostic ultra personnalisé qui révèle ce que tu n'as jamais osé te dire à toi-même.
+                </p>
+
+                <div style={S.archetypeGrid}>
+                  {Object.values(ARCHETYPES).map(a => (
+                    <div key={a.id} style={{...S.archetypeMini, background: a.accent}}>
+                      <span style={S.archetypeMiniEmoji}>{a.emoji}</span>
+                      <span style={{...S.archetypeMiniName, color: a.color}}>{a.nom}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button className="btn-main" onClick={() => go(() => setStep("quiz"))}>
+                  Découvrir mon archétype →
+                </button>
+                <p style={S.smallNote}>Diagnostic généré par IA · 100% personnalisé · Confidentiel</p>
+              </div>
+            </div>
+          )}
+
+          {/* ─── QUIZ ─── */}
+          {step === "quiz" && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                <div style={S.quizTop}>
+                  <span style={S.quizBrand}>Bilan de vie</span>
+                  <span style={S.qNum}>{current + 1} <span style={S.qOf}>/ {questions.length}</span></span>
+                </div>
+
+                <div style={S.track}>
+                  <div style={{...S.fill, width: `${progress}%`}}/>
+                </div>
+
+                <h2 style={S.qText}>{q.text}</h2>
+
+                <div style={S.optionsWrap}>
+                  {q.options.map((opt, i) => {
+                    const selected = currentAnswer === i;
+                    return (
+                      <button
+                        key={i}
+                        className="opt-btn"
+                        style={{
+                          ...S.optBtn,
+                          ...(selected ? S.optBtnSelected : {}),
+                        }}
+                        onClick={() => handleSelect(i)}
+                      >
+                        <span style={S.optEmoji}>{opt.emoji}</span>
+                        <span style={S.optLabel}>{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {current > 0 && (
+                  <button className="btn-back" onClick={handleBack}>
+                    ← Question précédente
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ─── LOADING ─── */}
+          {step === "loading" && (
+            <div className="pg en">
+              <div style={S.loadingWrap}>
+                <div className="loadingOrb"/>
+                <h2 style={S.loadingTitle}>Analyse en cours…</h2>
+                <p style={S.loadingMsg}>{LOADING_MSGS[loadingMsg]}</p>
+                <p style={S.loadingNote}>L'IA croise tes 15 réponses pour révéler ton archétype unique</p>
+              </div>
+            </div>
+          )}
+
+          {/* ─── RESULT ─── */}
+          {step === "result" && bilan && (
+            <div className={`pg ${leaving ? "lv" : "en"}`}>
+              <div style={S.wrap}>
+                {bilan.error ? (
+                  <div style={S.errorBox}>
+                    <p style={S.errorTxt}>Une erreur s'est produite. Réessaie dans quelques instants.</p>
+                    {bilan.errorMsg && <p style={S.errorDetail}>Détail : {bilan.errorMsg}</p>}
+                    <button className="btn-main" onClick={restart}>Recommencer</button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Hero archétype */}
+                    <div style={{...S.archHero, background: archetype.accent}}>
+                      <p style={{...S.archKicker, color: archetype.color}}>TON ARCHÉTYPE</p>
+                      <span style={S.archEmojiBig}>{archetype.emoji}</span>
+                      <h2 style={{...S.archName, color: archetype.color}}>{archetype.nom}</h2>
+                      <p style={{...S.archTagline, color: archetype.color}}>« {archetype.tagline} »</p>
+                    </div>
+
+                    {/* Portrait brutal */}
+                    <div style={S.section}>
+                      <p style={S.sectionLabel}>TON PORTRAIT</p>
+                      <p style={S.sectionTxt}>{bilan.portrait_brutal}</p>
+                    </div>
+
+                    {/* Pattern invisible */}
+                    <div style={{...S.section, background: "#FAEAE0"}}>
+                      <p style={{...S.sectionLabel, color: "#C04E2C"}}>🔍 LE PATTERN QUE TU NE VOIS PAS</p>
+                      <p style={{...S.sectionTxt, fontStyle: "italic"}}>{bilan.pattern_invisible}</p>
+                    </div>
+
+                    {/* Fausse croyance */}
+                    <div style={S.sectionDark}>
+                      <p style={S.sectionLabelDark}>LA FAUSSE CROYANCE</p>
+                      <p style={S.sectionTxtDark}>{bilan.fausse_croyance}</p>
+                    </div>
+
+                    {/* Déclic */}
+                    <div style={S.section}>
+                      <p style={S.sectionLabel}>✨ TON DÉCLIC</p>
+                      <p style={S.sectionTxt}>{bilan.declic_specifique}</p>
+                    </div>
+
+                    {/* Premier pas */}
+                    <div style={{...S.section, background: "#E5EFEA"}}>
+                      <p style={{...S.sectionLabel, color: "#5C8270"}}>🌱 TON PREMIER PAS CETTE SEMAINE</p>
+                      <p style={S.sectionTxt}>{bilan.premier_pas}</p>
+                    </div>
+
+                    {/* Phrase miroir */}
+                    <div style={S.phraseBox}>
+                      <p style={S.phraseTxt}>« {bilan.phrase_miroir} »</p>
+                      <p style={S.phraseCredit}>— Ton bilan Code Liberté</p>
+                    </div>
+
+                    {/* Code Liberté */}
+                    <div style={{...S.clBox, borderColor: archetype.color}}>
+                      <p style={{...S.clLabel, color: archetype.color}}>POURQUOI CODE LIBERTÉ POUR TOI</p>
+                      <p style={S.clTxt}>{bilan.code_liberte_lien}</p>
+                      <button className="btn-cta" style={{background: archetype.color}}>
+                        Découvrir Code Liberté →
+                      </button>
+                    </div>
+
+                    {/* Seller notes (privé) */}
+                    {bilan.seller_notes && (
+                      <details style={S.seller}>
+                        <summary style={S.sellerSum}>📊 Données vendeur (privé)</summary>
+                        <div style={S.sellerBody}>
+                          {Object.entries(bilan.seller_notes).map(([k, v]) => (
+                            <div key={k} style={S.sellerRow}>
+                              <span style={S.sellerKey}>{k}</span>
+                              <span style={S.sellerVal}>{v}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+
+                    <button className="btn-ghost" onClick={restart}>Refaire le bilan</button>
+                    <p style={S.footer}>Code Liberté · Brille &amp; Vibre</p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
 
     // ── SECTION 6: STYLES (S object) ──
 
