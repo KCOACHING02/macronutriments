@@ -16,6 +16,162 @@
     const { useState, useEffect } = React;
 
     // ── SECTION 1: QUESTIONS ──
+    // Chaque option attribue des points sur des dimensions cachées
+    // Dimensions: ambition, urgence, douleur, discipline, confiance, vision,
+    // action, scepticisme, ent_toxique, arg_peur, bloc_methode, bloc_argent,
+    // bloc_entourage, bloc_confiance, bloc_discipline
+    const questions = [
+      {
+        id: 1,
+        text: "Si l'argent coulait à flots dès demain matin, ta première pensée serait :",
+        options: [
+          { emoji: "👨‍👩‍👧", label: "« Je prends mes proches avec moi »", s: { ambition: 3, valeur_famille: 3 } },
+          { emoji: "✈️", label: "« Je pars loin, tout de suite »", s: { ambition: 3, urgence: 3, valeur_liberte: 3 } },
+          { emoji: "😮‍💨", label: "« Enfin la paix »", s: { douleur: 4, urgence: 3 } },
+          { emoji: "🎨", label: "« Je vais créer ce qui me fait vibrer »", s: { ambition: 3, valeur_creation: 3 } },
+        ],
+      },
+      {
+        id: 2,
+        text: "Quand tu vois quelqu'un réussir sur les réseaux :",
+        options: [
+          { emoji: "🔥", label: "Ça me booste à fond", s: { action: 3, confiance: 2 } },
+          { emoji: "😤", label: "« Pourquoi pas moi ? » me hante", s: { ambition: 3, urgence: 2 } },
+          { emoji: "🙄", label: "Je pense que c'est fake ou de la chance", s: { scepticisme: 4, confiance: -1 } },
+          { emoji: "😔", label: "Ça me déprime", s: { confiance: -3, douleur: 2 } },
+        ],
+      },
+      {
+        id: 3,
+        text: "Ta plus grande peur en te lançant, c'est :",
+        options: [
+          { emoji: "💸", label: "Perdre l'argent que j'aurai mis dedans", s: { arg_peur: 4, bloc_argent: 3 } },
+          { emoji: "👀", label: "Me planter devant tout le monde", s: { bloc_confiance: 3, ent_toxique: 2 } },
+          { emoji: "⛓️", label: "Que ma vie ne change pas et rester coincée", s: { urgence: 4, douleur: 3 } },
+          { emoji: "🌪️", label: "Réussir et ne plus reconnaître ma vie", s: { confiance: -2, bloc_confiance: 2 } },
+        ],
+      },
+      {
+        id: 4,
+        text: "Combien de fois t'as commencé quelque chose d'ambitieux sans le finir ?",
+        options: [
+          { emoji: "💪", label: "Jamais, je vais toujours au bout", s: { discipline: 4, action: 3 } },
+          { emoji: "🤏", label: "1 ou 2 fois", s: { discipline: 2 } },
+          { emoji: "😬", label: "Plusieurs fois", s: { discipline: -2, bloc_discipline: 3 } },
+          { emoji: "🙈", label: "Je préfère pas compter…", s: { discipline: -4, bloc_discipline: 4, confiance: -2 } },
+        ],
+      },
+      {
+        id: 5,
+        text: "Ton entourage proche, il est plutôt :",
+        options: [
+          { emoji: "💖", label: "Super soutenant, ils croient en moi", s: { ent_toxique: -3, confiance: 2 } },
+          { emoji: "😐", label: "Neutre, ils me laissent faire", s: { ent_toxique: 0 } },
+          { emoji: "🤨", label: "Sceptique mais pas méchant", s: { ent_toxique: 2, bloc_entourage: 2 } },
+          { emoji: "🪨", label: "Plombant : critiques, moqueries…", s: { ent_toxique: 4, bloc_entourage: 4, douleur: 2 } },
+        ],
+      },
+      {
+        id: 6,
+        text: "Si tu devais investir 500€ dans toi cette semaine, tu ferais quoi ?",
+        options: [
+          { emoji: "📚", label: "Une formation solide", s: { action: 2, vision: 2 } },
+          { emoji: "🤝", label: "Un coach qui m'accompagne", s: { action: 2, bloc_methode: 2 } },
+          { emoji: "🤔", label: "J'hésiterais des semaines", s: { action: -3, bloc_confiance: 2 } },
+          { emoji: "🏦", label: "Je les garderais « au cas où »", s: { arg_peur: 4, action: -3 } },
+        ],
+      },
+      {
+        id: 7,
+        text: "Ton rapport au temps aujourd'hui :",
+        options: [
+          { emoji: "🏃‍♀️", label: "Zéro temps, je suis débordée", s: { douleur: 3, urgence: 2 } },
+          { emoji: "📱", label: "J'ai du temps mais je le gaspille", s: { discipline: -3, bloc_discipline: 3 } },
+          { emoji: "⏰", label: "J'ai du temps et je suis prête", s: { action: 3 } },
+          { emoji: "🪫", label: "Plus d'énergie, même quand j'ai le temps", s: { douleur: 4, confiance: -2 } },
+        ],
+      },
+      {
+        id: 8,
+        text: "Quand tu imagines quitter ton boulot, tu ressens :",
+        options: [
+          { emoji: "🤩", label: "Une euphorie totale", s: { urgence: 4, ambition: 3 } },
+          { emoji: "😰", label: "De l'excitation + une panique financière", s: { ambition: 2, arg_peur: 3 } },
+          { emoji: "😣", label: "De la culpabilité, c'est stable", s: { bloc_confiance: 3, ent_toxique: 1 } },
+          { emoji: "😶‍🌫️", label: "Ça me paraît impossible", s: { confiance: -4, bloc_confiance: 4 } },
+        ],
+      },
+      {
+        id: 9,
+        text: "Ta vision dans 3 ans :",
+        options: [
+          { emoji: "🔭", label: "Claire et précise, je la visualise", s: { vision: 4, ambition: 3 } },
+          { emoji: "🌱", label: "Des envies mais pas de plan", s: { vision: 2 } },
+          { emoji: "🌫️", label: "Floue, je sais juste ce que je ne veux plus", s: { vision: -2, douleur: 2 } },
+          { emoji: "🥀", label: "Je n'ose plus rêver", s: { vision: -4, confiance: -3, douleur: 3 } },
+        ],
+      },
+      {
+        id: 10,
+        text: "Face à une nouvelle méthode business en ligne :",
+        options: [
+          { emoji: "🔍", label: "Je l'étudie à fond avant", s: { action: 1, scepticisme: 1 } },
+          { emoji: "⚡", label: "Je teste immédiatement", s: { action: 4, discipline: -1 } },
+          { emoji: "💬", label: "J'en parle autour mais je ne fais rien", s: { action: -3, bloc_discipline: 2 } },
+          { emoji: "📓", label: "Je note dans un coin et j'oublie", s: { action: -4, bloc_discipline: 3 } },
+        ],
+      },
+      {
+        id: 11,
+        text: "Ce qui te bloque vraiment aujourd'hui :",
+        options: [
+          { emoji: "🗺️", label: "Je ne sais pas par où commencer", s: { bloc_methode: 4 } },
+          { emoji: "🛡️", label: "J'ai peur de me faire arnaquer", s: { bloc_confiance: 3, scepticisme: 3 } },
+          { emoji: "💰", label: "Je n'ai pas les moyens financiers", s: { bloc_argent: 4, arg_peur: 2 } },
+          { emoji: "🧱", label: "Mon entourage freine des quatre fers", s: { bloc_entourage: 4, ent_toxique: 3 } },
+        ],
+      },
+      {
+        id: 12,
+        text: "Ta relation à l'argent :",
+        options: [
+          { emoji: "🤐", label: "C'est tabou chez moi", s: { arg_peur: 3 } },
+          { emoji: "😔", label: "J'aimerais en avoir plus mais je culpabilise", s: { arg_peur: 2, bloc_confiance: 2 } },
+          { emoji: "🛠️", label: "C'est un outil, je veux le maîtriser", s: { ambition: 2, action: 2 } },
+          { emoji: "😵‍💫", label: "C'est devenu obsessionnel", s: { urgence: 3, douleur: 2 } },
+        ],
+      },
+      {
+        id: 13,
+        text: "Quand tu te fixes un objectif, tu :",
+        options: [
+          { emoji: "📋", label: "Tu crées un plan détaillé", s: { discipline: 3, vision: 2 } },
+          { emoji: "🚀", label: "Tu te lances et tu verras bien", s: { action: 3, discipline: -1 } },
+          { emoji: "💭", label: "Tu en parles des mois avant d'agir", s: { action: -3 } },
+          { emoji: "🤫", label: "Tu l'écris et tu le caches", s: { bloc_confiance: 3, ent_toxique: 2 } },
+        ],
+      },
+      {
+        id: 14,
+        text: "Ta plus grande force que les autres ne voient pas :",
+        options: [
+          { emoji: "🪨", label: "Ma résilience, je ne lâche jamais", s: { force_resilience: 3, discipline: 1 } },
+          { emoji: "💡", label: "Ma créativité, j'ai 1000 idées", s: { force_creativite: 3, discipline: -1 } },
+          { emoji: "🫂", label: "Mon empathie, je comprends les gens", s: { force_empathie: 3 } },
+          { emoji: "🧠", label: "Ma capacité à apprendre vite", s: { force_apprentissage: 3, action: 1 } },
+        ],
+      },
+      {
+        id: 15,
+        text: "Si dans 1 an rien n'a changé dans ta vie, tu te sens comment ?",
+        options: [
+          { emoji: "😌", label: "Ça ira, je suis patiente", s: { urgence: -2 } },
+          { emoji: "😤", label: "Frustrée mais je continuerai", s: { urgence: 2 } },
+          { emoji: "💔", label: "Ça me détruira", s: { urgence: 4, douleur: 4 } },
+          { emoji: "🏳️", label: "J'aurai déjà abandonné l'idée", s: { urgence: -3, confiance: -3 } },
+        ],
+      },
+    ];
 
     // ── SECTION 2: ARCHÉTYPES ──
 
