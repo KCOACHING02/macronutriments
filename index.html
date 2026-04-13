@@ -1016,6 +1016,125 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
     };
 
     // ── SECTION 7: CSS STRING ──
+    const CSS = `
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #FAF5EF; -webkit-font-smoothing: antialiased; }
+
+      .pg { width: 100%; display: flex; justify-content: center; }
+      .pg.en { animation: up 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+      .pg.lv { animation: dn 0.26s ease forwards; pointer-events: none; }
+
+      @keyframes up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes dn {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-12px); }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.08); opacity: 0.7; }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .loadingOrb {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #D67B5C, #C04E2C);
+        box-shadow: 0 0 40px rgba(192, 78, 44, 0.4);
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+
+      .opt-btn:hover {
+        border-color: #C04E2C !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(192, 78, 44, 0.1);
+      }
+      .opt-btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-main {
+        background: #C04E2C;
+        color: #FFF;
+        border: none;
+        border-radius: 16px;
+        padding: 18px 24px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+        box-shadow: 0 6px 20px rgba(192, 78, 44, 0.25);
+      }
+      .btn-main:hover {
+        background: #A8431F;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(192, 78, 44, 0.35);
+      }
+
+      .btn-cta {
+        color: #FFF;
+        border: none;
+        border-radius: 14px;
+        padding: 16px 22px;
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.2s ease;
+      }
+      .btn-cta:hover {
+        opacity: 0.92;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-back {
+        background: transparent;
+        border: none;
+        color: #A89A90;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 10px 0;
+        text-align: center;
+        width: 100%;
+        transition: color 0.18s;
+      }
+      .btn-back:hover { color: #C04E2C; }
+
+      .btn-ghost {
+        background: transparent;
+        border: 1.5px solid #D9CABE;
+        color: #A89A90;
+        border-radius: 14px;
+        padding: 14px 22px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.18s;
+      }
+      .btn-ghost:hover {
+        border-color: #C04E2C;
+        color: #C04E2C;
+      }
+
+      details[open] summary { color: #2D1F1A; }
+    `;
 
     // ── RENDER ──
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
