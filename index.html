@@ -600,29 +600,20 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
           {/* ─── INTRO ─── */}
           {step === "intro" && (
             <div className={`pg ${leaving ? "lv" : "en"}`}>
-              <div style={S.wrap}>
-                <p style={S.kicker}>BILAN DE COMPÉTENCES DIGITALES · CODE LIBERTÉ</p>
+              <div style={{...S.wrap, paddingTop: 96, gap: 28}}>
+                <p style={S.kicker}>BILAN · CODE LIBERTÉ</p>
                 <h1 style={S.h1}>Quelle est ta<br/><em style={S.em}>voie business&nbsp;?</em></h1>
                 <div style={S.heroLine}/>
-                <p style={S.lead}>
-                  16 questions. 3 minutes. Aucun texte à écrire.
-                  <br/><br/>
-                  À la fin, tu sais <strong>exactement quel modèle business est fait pour toi</strong> parmi 12 voies possibles — avec une idée concrète personnalisée et ton premier pas pour démarrer cette semaine.
+
+                <p style={S.leadSimple}>
+                  3 minutes pour découvrir le modèle qui te correspond vraiment — avec une idée concrète personnalisée.
                 </p>
 
-                <div style={S.archetypeGrid}>
-                  {Object.values(VOIES).slice(0, 8).map(v => (
-                    <div key={v.id} style={{...S.archetypeMini, background: v.accent}}>
-                      <span style={{...S.archetypeMiniName, color: v.color}}>{v.nom}</span>
-                    </div>
-                  ))}
-                </div>
-                <p style={S.smallNote}>... et 4 autres voies à découvrir</p>
-
                 <button className="btn-main" onClick={() => go(() => setStep("quiz"))}>
-                  Découvrir ma voie business →
+                  Commencer →
                 </button>
-                <p style={S.smallNote}>Recommandation générée par IA · 100% personnalisée · Confidentiel</p>
+
+                <p style={S.smallNote}>16 questions · IA personnalisée · 100% gratuit</p>
               </div>
             </div>
           )}
@@ -856,6 +847,13 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         lineHeight: 1.7,
         color: "#5C4A40",
         fontWeight: 400,
+      },
+      leadSimple: {
+        fontSize: 18,
+        lineHeight: 1.6,
+        color: "#5C4A40",
+        fontWeight: 400,
+        marginTop: 4,
       },
       archetypeGrid: {
         display: "grid",
