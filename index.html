@@ -465,7 +465,8 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
       const [current, setCurrent] = useState(0);
       const [answers, setAnswers] = useState(Array(questions.length).fill(null));
       const [bilan, setBilan] = useState(null);
-      const [archetype, setArchetype] = useState(null);
+      const [voiePrincipale, setVoiePrincipale] = useState(null);
+      const [voieAlternative, setVoieAlternative] = useState(null);
       const [leaving, setLeaving] = useState(false);
       const [loadingMsg, setLoadingMsg] = useState(0);
       const [shareCopied, setShareCopied] = useState(false);
@@ -473,14 +474,13 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
       const q = questions[current];
       const progress = ((current) / questions.length) * 100;
       const currentAnswer = answers[current];
-      const allAnswered = answers.every(a => a !== null);
 
       const LOADING_MSGS = [
         "Analyse de tes réponses…",
-        "Identification de ton archétype…",
-        "Détection de tes patterns invisibles…",
-        "Construction de ton diagnostic…",
-        "Rédaction de ton bilan personnalisé…",
+        "Croisement de tes passions et de ton savoir-faire…",
+        "Identification de ta voie business idéale…",
+        "Recherche d'une idée concrète personnalisée…",
+        "Rédaction de ta recommandation…",
       ];
 
       useEffect(() => {
@@ -519,16 +519,16 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
         setStep("loading");
         try {
           const scores = computeScores(finalAnswers);
-          const detection = detectArchetype(scores);
-          const archId = detection.archetype;
-          setArchetype(ARCHETYPES[archId]);
+          const detection = detectVoies(scores);
+          setVoiePrincipale(VOIES[detection.voiePrincipale]);
+          setVoieAlternative(VOIES[detection.voieAlternative]);
 
-          const prompt = buildPrompt(finalAnswers, archId, scores);
+          const prompt = buildPrompt(finalAnswers, detection.voiePrincipale, detection.voieAlternative, scores);
           const response = await fetch("/api/bilan", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              system: "Tu es un coach expert en psychologie comportementale. Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans aucun texte avant ou après le JSON.",
+              system: "Tu es un expert en business en ligne et orientation professionnelle. Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans aucun texte avant ou après le JSON.",
               messages: [{ role: "user", content: prompt }],
             }),
           });
@@ -549,12 +549,12 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
       const restart = () => go(() => {
         setStep("intro"); setCurrent(0);
         setAnswers(Array(questions.length).fill(null));
-        setBilan(null); setArchetype(null); setLoadingMsg(0);
+        setBilan(null); setVoiePrincipale(null); setVoieAlternative(null); setLoadingMsg(0);
       });
 
       const handleShare = async (platform) => {
         const url = window.location.href;
-        const text = `Je viens de découvrir mon archétype : « ${archetype?.nom} ». Découvre le tien :`;
+        const text = `Je viens de découvrir ma voie business : « ${voiePrincipale?.nom} ». Fais ton bilan ici :`;
         if (platform === "whatsapp") {
           window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, "_blank");
         } else if (platform === "copy") {
@@ -601,27 +601,28 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
           {step === "intro" && (
             <div className={`pg ${leaving ? "lv" : "en"}`}>
               <div style={S.wrap}>
-                <p style={S.kicker}>BILAN DE VIE · CODE LIBERTÉ</p>
-                <h1 style={S.h1}>Quelle femme<br/><em style={S.em}>es-tu vraiment&nbsp;?</em></h1>
+                <p style={S.kicker}>BILAN DE COMPÉTENCES DIGITALES · CODE LIBERTÉ</p>
+                <h1 style={S.h1}>Quelle est ta<br/><em style={S.em}>voie business&nbsp;?</em></h1>
                 <div style={S.heroLine}/>
                 <p style={S.lead}>
-                  15 questions. 2 minutes. Aucun texte à écrire.
+                  16 questions. 3 minutes. Aucun texte à écrire.
                   <br/><br/>
-                  À la fin, tu découvres <strong>ton archétype</strong> parmi six profils — et un diagnostic ultra personnalisé qui révèle ce que tu n'as jamais osé te dire à toi-même.
+                  À la fin, tu sais <strong>exactement quel modèle business est fait pour toi</strong> parmi 12 voies possibles — avec une idée concrète personnalisée et ton premier pas pour démarrer cette semaine.
                 </p>
 
                 <div style={S.archetypeGrid}>
-                  {Object.values(ARCHETYPES).map(a => (
-                    <div key={a.id} style={{...S.archetypeMini, background: a.accent}}>
-                      <span style={{...S.archetypeMiniName, color: a.color}}>{a.nom}</span>
+                  {Object.values(VOIES).slice(0, 8).map(v => (
+                    <div key={v.id} style={{...S.archetypeMini, background: v.accent}}>
+                      <span style={{...S.archetypeMiniName, color: v.color}}>{v.nom}</span>
                     </div>
                   ))}
                 </div>
+                <p style={S.smallNote}>... et 4 autres voies à découvrir</p>
 
                 <button className="btn-main" onClick={() => go(() => setStep("quiz"))}>
-                  Découvrir mon archétype →
+                  Découvrir ma voie business →
                 </button>
-                <p style={S.smallNote}>Diagnostic généré par IA · 100% personnalisé · Confidentiel</p>
+                <p style={S.smallNote}>Recommandation générée par IA · 100% personnalisée · Confidentiel</p>
               </div>
             </div>
           )}
@@ -676,7 +677,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                 <div className="loadingOrb"/>
                 <h2 style={S.loadingTitle}>Analyse en cours…</h2>
                 <p style={S.loadingMsg}>{LOADING_MSGS[loadingMsg]}</p>
-                <p style={S.loadingNote}>L'IA croise tes 15 réponses pour révéler ton archétype unique</p>
+                <p style={S.loadingNote}>L'IA croise tes 16 réponses pour identifier ta voie business idéale</p>
               </div>
             </div>
           )}
@@ -694,35 +695,35 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                   </div>
                 ) : (
                   <>
-                    {/* Hero archétype */}
-                    <div style={{...S.archHero, background: archetype.accent}}>
-                      <p style={{...S.archKicker, color: archetype.color}}>TON ARCHÉTYPE</p>
-                      <h2 style={{...S.archName, color: archetype.color}}>{archetype.nom}</h2>
-                      <p style={{...S.archTagline, color: archetype.color}}>« {archetype.tagline} »</p>
+                    {/* Hero voie principale */}
+                    <div style={{...S.archHero, background: voiePrincipale.accent}}>
+                      <p style={{...S.archKicker, color: voiePrincipale.color}}>TA VOIE BUSINESS</p>
+                      <h2 style={{...S.archName, color: voiePrincipale.color}}>{voiePrincipale.nom}</h2>
+                      <p style={{...S.archTagline, color: voiePrincipale.color}}>« {voiePrincipale.tagline} »</p>
                     </div>
 
-                    {/* Portrait brutal */}
+                    {/* Portrait express */}
                     <div style={S.section}>
-                      <p style={S.sectionLabel}>TON PORTRAIT</p>
-                      <p style={S.sectionTxt}>{bilan.portrait_brutal}</p>
+                      <p style={S.sectionLabel}>OÙ TU EN ES AUJOURD'HUI</p>
+                      <p style={S.sectionTxt}>{bilan.portrait_express}</p>
                     </div>
 
-                    {/* Pattern invisible */}
-                    <div style={{...S.section, background: "#FAEAE0"}}>
-                      <p style={{...S.sectionLabel, color: "#C04E2C"}}>LE PATTERN QUE TU NE VOIS PAS</p>
-                      <p style={{...S.sectionTxt, fontStyle: "italic"}}>{bilan.pattern_invisible}</p>
+                    {/* Pourquoi cette voie */}
+                    <div style={{...S.section, background: voiePrincipale.accent}}>
+                      <p style={{...S.sectionLabel, color: voiePrincipale.color}}>POURQUOI CETTE VOIE EST FAITE POUR TOI</p>
+                      <p style={S.sectionTxt}>{bilan.pourquoi_cette_voie}</p>
                     </div>
 
-                    {/* Fausse croyance */}
+                    {/* Idée business concrète — LA STAR */}
                     <div style={S.sectionDark}>
-                      <p style={S.sectionLabelDark}>LA FAUSSE CROYANCE</p>
-                      <p style={S.sectionTxtDark}>{bilan.fausse_croyance}</p>
+                      <p style={S.sectionLabelDark}>TON IDÉE BUSINESS CONCRÈTE</p>
+                      <p style={S.sectionTxtDark}>{bilan.idee_business_concrete}</p>
                     </div>
 
-                    {/* Déclic */}
+                    {/* Pourquoi ça marche */}
                     <div style={S.section}>
-                      <p style={S.sectionLabel}>TON DÉCLIC</p>
-                      <p style={S.sectionTxt}>{bilan.declic_specifique}</p>
+                      <p style={S.sectionLabel}>POURQUOI ÇA MARCHE POUR TOI</p>
+                      <p style={S.sectionTxt}>{bilan.pourquoi_ca_marche_pour_toi}</p>
                     </div>
 
                     {/* Premier pas */}
@@ -737,9 +738,15 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                       <p style={S.phraseCredit}>— Ton bilan Code Liberté</p>
                     </div>
 
+                    {/* Voie alternative */}
+                    <div style={{...S.section, background: voieAlternative.accent}}>
+                      <p style={{...S.sectionLabel, color: voieAlternative.color}}>TON PLAN B : {voieAlternative.nom.toUpperCase()}</p>
+                      <p style={S.sectionTxt}>{bilan.voie_alternative_raison}</p>
+                    </div>
+
                     {/* Code Liberté avec CTA dynamique */}
-                    <div style={{...S.clBox, borderColor: archetype.color}}>
-                      <p style={{...S.clLabel, color: archetype.color}}>POURQUOI CODE LIBERTÉ POUR TOI</p>
+                    <div style={{...S.clBox, borderColor: voiePrincipale.color}}>
+                      <p style={{...S.clLabel, color: voiePrincipale.color}}>POURQUOI CODE LIBERTÉ POUR TOI</p>
                       <p style={S.clTxt}>{bilan.code_liberte_lien}</p>
                       {(() => {
                         const cta = getDynamicCTA();
@@ -747,7 +754,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
                           <>
                             <button
                               className="btn-cta"
-                              style={{background: archetype.color}}
+                              style={{background: voiePrincipale.color}}
                               onClick={() => window.open(cta.url, "_blank")}
                             >
                               {cta.label}
@@ -760,7 +767,7 @@ Réponds UNIQUEMENT avec ce JSON, rien d'autre :
 
                     {/* Bouton de partage */}
                     <div style={S.shareBox}>
-                      <p style={S.shareLabel}>Tu t'es reconnue ? Envoie ton archétype à 3 amies</p>
+                      <p style={S.shareLabel}>Tu t'es reconnue ? Envoie ce bilan à 3 amies</p>
                       <div style={S.shareBtns}>
                         <button className="share-btn" onClick={() => handleShare("whatsapp")}>WhatsApp</button>
                         <button className="share-btn" onClick={() => handleShare("instagram")}>Instagram</button>
